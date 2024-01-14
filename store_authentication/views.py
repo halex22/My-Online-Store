@@ -61,3 +61,15 @@ class LogIn(LoginView):
 
 class LogOut(LogoutView):
     next_page = reverse_lazy('home-store')
+
+
+class BecomeSeller(MyBaseCreateView):
+    template_name = 'store_auth/new_seller.html'
+    model = Seller
+    form_class = SellerForm
+
+    success_url = reverse_lazy('home-store')
+
+    @decorators.add_info_to_form(edit_user_model=True)
+    def form_valid(self, form):
+        return super().form_valid(form)

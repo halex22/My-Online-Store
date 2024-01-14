@@ -1,5 +1,6 @@
 from typing import Any
 from django.contrib.auth.forms import UserCreationForm
+from django.forms import ModelForm
 from .models import *
 from store_management.models import StoreUser
 
@@ -26,3 +27,10 @@ class SingUpForm(UserCreationForm):
         model = StoreUser
 
         fields = ("username",)
+
+
+class SellerForm(ModelForm):
+
+    class Meta:
+        model = Seller
+        fields = "__all__"
