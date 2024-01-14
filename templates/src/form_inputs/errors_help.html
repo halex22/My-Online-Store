@@ -1,0 +1,15 @@
+{% if field.errors %}
+<div class="help-text-container mt-2 flex justify-center text-sm text-red-400">
+    <ul class="error-list">
+    {% for error in field.errors %}                                
+            <li>{{error|title}} </li>             
+    {% endfor %}
+    </ul>
+</div>
+{% else %}
+    {% if field.help_text %}
+        <div class="help-text-container mt-2 flex justify-center text-sm text-gray-400">
+            {{field.help_text}}
+        </div>
+    {% endif %}
+{% endif %}

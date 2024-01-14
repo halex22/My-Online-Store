@@ -1,0 +1,29 @@
+{% load static %}
+{% load compress %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet" />
+
+		{% block css_block %}{% endblock css_block %}
+		{% block js_block %}{% endblock js_block %}
+		{% compress css %}
+		<link rel="stylesheet" href="{% static 'src/output.css' %}">
+		{% endcompress %}
+    <title>{% block title %}{% endblock title %}</title>
+  </head>
+  <body>
+		{% include "src/navbar.html" %}
+		<main>
+    {% block content %}
+		
+		{% endblock content %}
+		</main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+
+  </body>
+
+
+</html>

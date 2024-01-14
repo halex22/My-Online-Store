@@ -1,0 +1,63 @@
+{% extends 'src/base.html' %}
+{% load static %}
+{% block css_block %}
+<!-- <link rel="stylesheet" href="{% static 'css/sign_up.css' %}"> -->
+{% endblock css_block %}
+
+{% block content %}
+
+<div id="msg-container " class="mt-2 text-center">
+  <h2 class='mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl'>Thanks for signing up</h2>
+  <p class="mb-3 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">Please fill this form to start with</p>
+</div>
+
+<form class="max-w-sm mx-auto" method="post">
+  {% csrf_token %}
+  {% for field in form %}
+  <div class="mb-5">
+    <label for="{{field.id_for_label}}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{field.label}}</label>
+   
+    {% if field.errors %}
+      <input
+        type="text"
+        id='{{field.id_for_label}}'
+        name="{{field.name}}"
+        class="bg-red-50 border border-red-500 text-red-900 placeholder-red-700 text-sm rounded-lg focus:ring-red-500 dark:bg-gray-700 focus:border-red-500 block w-full p-2.5 dark:text-red-500 dark:placeholder-red-500 dark:border-red-500"
+        {% if field.value %}value="{{field.value}}"{% endif %} 
+      >
+      {% for error in field.errors %}
+      <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{error}}</p>
+      
+      {% endfor %}
+      <p id="helper-text-explanation" class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{field.help_text}}</p>
+
+    {% else %}
+      {% if field.value %}
+        <input 
+            type="{{field.widget_type}}"
+            id="{{field.id_for_label}}" 
+            name="{{field.name}}"
+            value='{{field.value}}'
+            class="bg-green-50 border border-green-500 text-green-900 dark:text-green-400 placeholder-green-700 dark:placeholder-green-500 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5 dark:bg-gray-700 dark:border-green-500"
+          >
+      {% else %}
+        <input 
+        type="{{field.widget_type}}"
+        id="{{field.id_for_label}}" 
+        name="{{field.name}}"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+        {% if field.value %}
+        value='{{field.value}}'
+        {% endif %}
+      >
+        <p id="helper-text-explanation" class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{field.help_text}}</p>
+      {% endif %}
+    {% endif %}
+
+    
+  </div>
+  {% endfor %}
+  <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Submit</button>
+</form>
+  
+{% endblock content %}

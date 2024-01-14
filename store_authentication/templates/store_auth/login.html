@@ -1,0 +1,41 @@
+{% extends "src/base.html" %} 
+
+{% block title %} E-Store Welcome Back {% endblock title %}
+
+{% block content %}
+
+<div id="msg-container" class="text-2xl text-center mx-32 mt-4">
+	<p>
+		Welcome back to <strong>E-Store</strong> the place where you can buy and sell 
+		all that you want 
+	</p>
+</div>
+
+<div id="outer-form-container" class="text-center mt-8">
+  <form action="" method="post">
+    <div class="inner-form-container">
+			{% csrf_token %}
+      {% for field in form %}
+      <div class="field-container">
+        <label for="{{field.id_for_label}}"><span>{{field.label}}</span></label>
+        <input
+            type="{{field.widget_type}}"
+            id="{{field.id_for_label}}"
+            name="{{field.name}}"
+            {% include 'src/form_inputs/class.html' %}
+        />
+      </div>
+      {% endfor %}
+			<div class="btn-container">
+				<button
+				type="submit"
+				class="rounded-lg bg-blue-600 hover:bg-blue-800 px-2.5 text-white font-bold mt-2"
+				>
+				Log In
+				</button>
+			</div>
+    </div>
+  </form>
+</div>
+
+{% endblock content %}

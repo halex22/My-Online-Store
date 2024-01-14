@@ -1,0 +1,14 @@
+<label for="{{field.id_for_label}}">
+  <span class="mr-2">{{field.label}}</span>
+  <input
+  type="number"
+  {% if step %}step="{{step}}"{% endif %}
+  {% if max %}max="{{max}}"{% endif %}
+  {% if min %}min="{{min}}"{% endif %}
+  name="{{field.name}}"
+  id="{{field.id_for_label}}"
+  placeholder="0.00"
+  {% include 'src/form_inputs/class.html' %}
+  />
+  <span>€</span>
+</label>
