@@ -1,0 +1,95 @@
+{% extends "src/base.html" %}
+{% load static %}
+{% block title %}{{product.name|title}}{% endblock title %}
+
+{% block content %}
+<div id="main-container">
+	<div id="info-container" class="grid md:grid-cols-6 lg:grid-cols-7">
+		<section id="img-name" class="md:col-span-3 lg:col-span-4">
+			<header class="mb-4"><h4 class="font-bold text-2xl mt-4 text-center">{{product.name}}</h4></header>
+				<aside>
+					<div id="outer-optns-container" class="flex justify-center ">
+						{% include 'src/components/edit_and_others.html'%}
+					</div> 
+				</aside>
+				
+				<div id="img-container" class="mt-4 flex justify-center">
+					<img
+						src="{% if product.img %}{{product.img.url}}{% else %}/media/defaults/defaultProductImage.png{% endif %}"
+						alt="{{product.name}} img"
+						class="h-auto max-w-sm"
+					>
+				</div>
+		</section>
+
+		<section id="general-info" class="max-sm:text-center md:col-span-3 px-4">
+			<p id="price" class="mt-4 text-2xl font-bold">{{product.price}} €</p>
+			<div id="seller-name">
+				<span>Sold by: </span>
+				<h4 class="inline text-blue-500 font-semibold my-6">
+					<a href="{% url 'seller-products' name=product.seller.name pk=product.seller.pk %}">{{product.seller.name|title}}</a>
+				</h4>
+			</div>
+			{% include 'src/components/purchase.html' %}
+			<div id="rating" class="max-sm:flex justify-center mt-2">
+				{% include 'src/components/global_rating.html' %}
+			</div> 
+			<div class="flex mt-4 max-sm:justify-center">
+				<div class="me-4">
+					{% include 'src/components/check_x.html' with key='is local' state=product.is_local %}
+				</div>
+				<div>
+					{% include 'src/components/check_x.html' with key='is available' state=product.is_available %}
+				</div>
+			</div>
+
+			<div id="product-description" class="mt-4">
+				<h4 class="mb-2 text-lg font-semibold text-gray-900">Description</h4>
+				<p class="text-gray-500 text-base">
+				{% if product.description %}
+					{{product.description}}
+				{% else %}
+					<span >The seller has not provide a description yet</span>
+				{% endif %}
+				</p>
+			</div>
+
+			<div id="characteristics" class="mt-4">
+				<h2 class="mb-2 text-lg font-semibold text-gray-900">Product characteristics:</h2>
+				<ul class="max-w-md space-y-1 text-gray-500 list-disc list-inside">
+						<li class="text-base">
+								I'ts really good
+						</li>
+						<li class="text-base">
+								Better than others
+						</li>
+						<li class="text-base">
+								Why ? I'm not telling you why
+						</li>
+				</ul>
+			</div>
+
+			<div id="tiem" class="mt-4 text-sm text-gray-500">
+				<div class="flex"><p class="min-w-36">Producted added on: </p> <span>{{product.added_date}}</span></div>
+				<div class="flex"><p class="min-w-36">Last modified: </p> <span>{{product.modified_date}}</span></div>
+			</div>
+			
+		</section>
+	</div>
+
+	<section id="comment-section" class="mt-6 px-4 ">
+		<header><h2 class="font-bold">Comments</h2></header>
+		<div id="comment-and-raiting" class=" md:grid grid-cols-6">
+			<div class="md:col-span-3 mt-4 sm:mb-4 ">
+				<div class="max-sm:px-4">
+					{% include 'src/components/detail_rating.html'%}
+				</div>
+			</div>
+			<div class="md:col-span-3 max-sm:mt-4">
+				{% include 'src/components/raiting_comment.html'%}
+			</div>
+		</div>
+	</section>
+</div>
+
+{% endblock content %}

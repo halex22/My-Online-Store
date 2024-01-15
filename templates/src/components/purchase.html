@@ -1,0 +1,40 @@
+{% if product.is_available %}
+<button
+  type="button"
+  class="my-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+>
+  <svg
+    class="w-3.5 h-3.5 me-2"
+    aria-hidden="true"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="currentColor"
+    viewBox="0 0 18 21"
+  >
+    <path
+      d="M15 12a1 1 0 0 0 .962-.726l2-7A1 1 0 0 0 17 3H3.77L3.175.745A1 1 0 0 0 2.208 0H1a1 1 0 0 0 0 2h.438l.6 2.255v.019l2 7 .746 2.986A3 3 0 1 0 9 17a2.966 2.966 0 0 0-.184-1h2.368c-.118.32-.18.659-.184 1a3 3 0 1 0 3-3H6.78l-.5-2H15Z"
+    />
+  </svg>
+  <a href="{% url 'cart' pk=product.pk %}">Add to cart</a>
+  
+</button>
+{% endif %}
+<button
+  type="button"
+  class="my-2 text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2"
+>
+  <svg
+    class="w-3.5 h-3.5 me-2"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+    viewBox="0 0 16 16"
+  >
+    <path
+      d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"
+      fill="white"
+      stroke="white"
+      stroke-line="2"
+    ></path>
+  </svg>
+  <a href="">Add to wish list</a>
+  
+</button>

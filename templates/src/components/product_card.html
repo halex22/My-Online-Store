@@ -17,11 +17,14 @@
         {{product.name|title}}
       </h5>
     </a>
-    {% include 'store_management/components/global_rating.html' %}
+    {% include 'src/components/global_rating.html' %}
     <div class="flex items-center justify-between mt-4">
-      <span class="text-3xl font-bold text-gray-900 dark:text-white"
-        >{{product.price}} €</span
-      >
+      <span class="text-3xl font-bold text-gray-900 dark:text-white">
+        {{product.foodproduct.price}}
+        {{product.electronicproduct.price}}
+        €
+      </span>
+
       <a
         href="#"
         class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"

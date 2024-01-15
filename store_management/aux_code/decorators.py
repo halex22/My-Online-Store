@@ -2,6 +2,7 @@ from functools import wraps
 from django.forms import BaseModelForm
 from django.http import HttpRequest
 from django.shortcuts import redirect, get_object_or_404
+from django.core.exceptions import PermissionDenied
 from ..models import StoreUser, Seller
 # from django.views import View
 
@@ -26,6 +27,18 @@ def user_is_anonymous(view_method):
             return redirect('home')
 
     return decorator
+
+
+def admit_only_sellers(view_method):
+
+    def decoretor(self, request: HttpRequest, *args, **kwargs):
+        user = request.user
+        if user.is_authenticated and user.is_seller:
+            return view_method(self, request, *args, **kwargs)
+        else:
+            raise PermissionDenied()
+        
+    return decoretor
 
 
 def handle_img_from_form(view_method):
