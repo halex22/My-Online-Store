@@ -2,9 +2,10 @@ from typing import Any
 from django.forms import BaseModelForm
 from django.contrib.auth import login
 from django.http import HttpRequest, HttpResponse
+from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView
 from .aux_code import decorators
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from .models import *
 from .forms import *
@@ -39,13 +40,17 @@ class AddElecView(BaseCreate):
     form_class = ElectronicModelForm
 
 
-class EditFoodProduct(UpdateView):
+class MyBaseUpdate(LoginRequiredMixin, UpdateView):
+    login_url = reverse_lazy('log-in')
+
+
+class EditFoodProduct(MyBaseUpdate):
     template_name = 'store_management/update/food.html'
     model = FoodProduct
     form_class = FoodModelForm
 
 
-class EditElectroProduct(UpdateView):
+class EditElectroProduct(MyBaseUpdate):
     template_name = 'store_management/update/electro.html'
     model = ElectronicProduct
     form_class = ElectronicModelForm

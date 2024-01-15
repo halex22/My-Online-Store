@@ -56,7 +56,11 @@ class LogIn(LoginView):
     redirect_authenticated_user = True
 
     def get_success_url(self) -> str:
-        return reverse('home-store')
+        next_param = self.request.GET.get('next')
+        if next_param:
+            return next_param
+        else:
+            return reverse('home-store')
 
 
 class LogOut(LogoutView):
