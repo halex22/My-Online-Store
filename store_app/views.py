@@ -7,7 +7,7 @@ from django.views.generic.base import ContextMixin
 from django.views.decorators.http import require_POST
 from django.utils.decorators import method_decorator
 from store_management.models import BaseProduct
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from .models import *
@@ -59,9 +59,15 @@ class ProductsBySellerView(ListView):
         return self.model.objects.filter(seller_id=self.kwargs['pk'])
 
 
-class MyCartView(LoginRequiredMixin, DetailView):
-    model = Cart
+class MyCartView(LoginRequiredMixin, TemplateView):
     template_name = 'store_app/cart.html'
+    
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        cart, created = Cart.objects.get_or_create(client_id=self.request.user.id)
+        cart.calculate_total_price()
+        context['cart'] = cart
+        return context
 
 
 class MyWishView(LoginRequiredMixin, DetailView):
@@ -77,12 +83,11 @@ class RequirePostMixin:
     
 
 
-class BaseAdd(RequirePostMixin, View):
+class BaseRequireView(RequirePostMixin, View):
 
     product = None
 
     def post(self, request: HttpRequest, *args, **kwargs):
-        self.set_object()
         return redirect(self.get_success_url())
     
     def set_object(self, *args, **kwargs):
@@ -93,13 +98,50 @@ class BaseAdd(RequirePostMixin, View):
         return reverse('product', kwargs={'pk':self.product.pk})
 
 
-class Add2Cart(BaseAdd):
+class Add2Cart(LoginRequiredMixin, BaseRequireView):
+    login_url = '/log-in'
+    cart_item = None
+    quantity = None
     
     def post(self, request: HttpRequest, *args, **kwargs):
+        self.set_object()
+        self.get_desired_quantity()
+        self.set_cart_item()
+        cart, created = Cart.objects.get_or_create(client_id=self.request.user.id)
+        cart.products.add(self.cart_item)
+        cart.save()
         return super().post(request, *args, **kwargs)
+    
+    def get_desired_quantity(self, *args, **kwargs):
+        self.quantity = int(self.request.POST['quantity'])
+
+    def set_cart_item(self, *args, **kwargs):
+        self.cart_item, created = CartItem.objects.get_or_create(
+            product=self.product, customer=self.request.user
+        )
+        if created:
+            self.cart_item.quantity += (self.quantity - 1)
+        else:
+            self.cart_item.quantity += self.quantity
+        self.cart_item.save()
 
 
-class Add2Wish(BaseAdd):
+
+class Add2Wish(BaseRequireView):
 
     def post(self,request: HttpRequest, *args, **kwargs):
         return super().post(request, *args, **kwargs)
+
+
+class BaseRemove(LoginRequiredMixin, View):
+    login_url = '/log-in'
+
+
+class RemoveTest(UserPassesTestMixin):
+
+    def test_func(self) -> bool | None:
+        return Cart.objects.get(client_id=self.request.user.id)
+
+
+class RemoveFromCart(RemoveTest, BaseRemove):
+    pass

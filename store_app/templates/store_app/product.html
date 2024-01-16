@@ -31,6 +31,17 @@
 				</h4>
 			</div>
 			{% include 'src/components/purchase.html' %}
+			{% include 'store_app/quantity.html' %}
+
+			<script>
+				// form.preventDefault()
+				const btn = document.getElementById('cart-btn');
+				btn.addEventListener('click',  () => {
+					const form = document.getElementById('cart-form');
+					form.submit();
+				})
+			</script>
+			
 			<div id="rating" class="max-sm:flex justify-center mt-2">
 				{% include 'src/components/global_rating.html' %}
 			</div> 

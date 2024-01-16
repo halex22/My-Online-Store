@@ -3,23 +3,12 @@ from store_management.models import *
 
 product_types = ['foodproduct', 'electronicproduct', 'fornitureproduct']
 
-class Cart(models.Model):
-    client = models.ForeignKey(StoreUser, on_delete=models.CASCADE)
-    products = models.ManyToManyField(BaseProduct, related_name = 'carts_products')
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, null=True, blank=True)
-
-    def calculate_total_price(self):
-        pass
-
-    def save(self, *args, **kwargs):
-        self.total_price = self.calculate_total_price()
-        super().save(*args, **kwargs)
-
 
 class CartItem(models.Model):
     product = models.ForeignKey(BaseProduct, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
-    total_cost = models.PositiveIntegerField(null=True)
+    total_cost = models.DecimalField(null=True, max_digits=5 ,decimal_places=2)
+    customer = models.ForeignKey(StoreUser, on_delete=models.CASCADE, null=True)
 
     def save(self, *args, **kwargs):
         self.total_cost = self.quantity * self.get_product_price()
@@ -30,6 +19,25 @@ class CartItem(models.Model):
             if hasattr(self.product, _):
                 instance = getattr(self.product, _)
                 return instance.price
+            
+
+class Cart(models.Model):
+    client = models.ForeignKey(StoreUser, on_delete=models.CASCADE)
+    products = models.ManyToManyField(CartItem, related_name = 'cart_items')
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, null=True, blank=True)
+
+    def calculate_total_price(self):
+        total = 0
+        for item in self.products.all():
+            total += item.total_cost
+        return total
+
+    def save(self, *args, **kwargs):
+        self.total_price = self.calculate_total_price()
+        super().save(*args, **kwargs)
+
+
+
     
 
 class WishList(models.Model):

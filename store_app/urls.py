@@ -8,7 +8,7 @@ urlpatterns = [
     path('products/<str:name>-<int:pk>', view=ProductsBySellerView.as_view(), name='seller-products'),
 
     # Cart views
-    path('my-cart/<int:pk>', view=MyCartView.as_view(), name='cart'),
+    path('my-cart', view=MyCartView.as_view(), name='cart'),
     path('add-product-to-cart/<int:pk>', view=Add2Cart.as_view(), name='add-2-cart'),
 
     # Wish List views
