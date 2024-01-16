@@ -1,0 +1,13 @@
+{% extends "src/base.html" %}
+
+{% block title %}Delete Product{% endblock title %}
+
+
+{% block content %}
+<div id="form-container" class="text-center mt-40">
+	<form method="post">{% csrf_token %}
+			<p class="font-bold text-xl mb-8">Are you sure you want to delete <span class="text-blue-700">"{{ product.name|title }}"</span>?</p>
+			<input type="submit" value="Confirm" class="rounded-lg font-semibold text-white bg-red-600 px-4 text-lg hover:bg-red-700">
+	</form>
+</div>
+{% endblock content %}

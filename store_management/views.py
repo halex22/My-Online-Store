@@ -1,9 +1,7 @@
 from typing import Any
-from django.forms import BaseModelForm
 from django.contrib.auth import login
-from django.http import HttpRequest, HttpResponse
 from django.urls import reverse, reverse_lazy
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, DeleteView
 from .aux_code import decorators
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import redirect
@@ -16,6 +14,13 @@ class SellerTest(UserPassesTestMixin):
 
     def test_func(self) -> bool | None:
         return self.request.user.is_seller
+
+
+class ProductOwnerTest(UserPassesTestMixin):
+
+    def test_func(self) -> bool | None:
+        obj = self.get_object()
+        return obj.seller.store_user_id == self.request.user.id
 
 
 # Create views
@@ -59,13 +64,6 @@ class MyBaseUpdate(LoginRequiredMixin, UpdateView):
     login_url = reverse_lazy('log-in')
 
 
-class ProductOwnerTest(UserPassesTestMixin):
-
-    def test_func(self) -> bool | None:
-        obj = self.get_object()
-        return obj.seller.store_user_id == self.request.user.id
-
-
 class MyUpdateView(Seller, ProductOwnerTest, MyBaseUpdate):
 
     @decorators.add_info_to_form(key_name='seller')
@@ -92,3 +90,24 @@ class EditForniProduct(MyUpdateView):
     template_name = 'store_management/update/forni.html'
     model = FornitureProduct
     form_class = ForniModelForm
+
+
+# Delete view
+class MyBaseDelete(LoginRequiredMixin, DeleteView):
+
+    login_url = reverse_lazy('log-in')  
+
+
+class MyDeleteView(SellerTest, MyBaseDelete):
+    pass
+
+
+class DeleteProductView(MyDeleteView):
+    template_name = 'store_management/delete.html'
+    model = BaseProduct
+    context_object_name = 'product'
+
+    def get_success_url(self) -> str:
+        seller_name = self.request.user.seller.name
+        seller_id = self.request.user.seller.id
+        return reverse('seller-products', kwargs={'name':seller_name, 'pk':seller_id})

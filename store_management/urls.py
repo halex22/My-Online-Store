@@ -12,6 +12,7 @@ urlpatterns = [
     # Update model paths
     path('update/food-product/<int:pk>', view=EditFoodProduct.as_view(), name='food-update'),
     path('update/electronic-product/<int:pk>', view=EditElectroProduct.as_view(), name='electro-update'),
-    path('update/forniture-product/<int:pk>', view=EditForniProduct.as_view(), name='forni-update')
+    path('update/forniture-product/<int:pk>', view=EditForniProduct.as_view(), name='forni-update'),
 
+    path('delete-product/<str:name>/<int:pk>', view=DeleteProductView.as_view(), name='delete-product')
 ]
