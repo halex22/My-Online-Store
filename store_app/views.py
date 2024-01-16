@@ -1,18 +1,19 @@
 from typing import Any
-from django.http import HttpRequest, HttpResponse
+from django.db.models.query import QuerySet
+from django.http import HttpRequest, HttpResponse, HttpResponse as HttpResponse
 from django.shortcuts import render
 from django.shortcuts import HttpResponse
-from django.views.generic import TemplateView, View, DetailView
+from django.views.generic import TemplateView, View, DetailView, ListView
 from store_management.models import BaseProduct
 # Create your views here.
 
 class HomeStore(TemplateView):
     template_name = 'store_app/index.html'
 
+
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['products'] = BaseProduct.objects.all()
-        print(context['products'])
         return context
     
 class PreCart(View):
@@ -42,11 +43,16 @@ class ProductView(DetailView):
         return context
     
 
-class ProductsBySellerView(TemplateView):
+class ProductsBySellerView(ListView):
     template_name = 'store_app/product_list.html'
+    model = BaseProduct
+    context_object_name = 'products'
 
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        context['products'] = BaseProduct.objects.filter(seller_id=self.kwargs['pk'])
-        return context
+    def get_queryset(self) -> QuerySet[Any]:
+        return self.model.objects.filter(seller_id=self.kwargs['pk'])
+
+    # def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+    #     context = super().get_context_data(**kwargs)
+    #     context['products'] = BaseProduct.objects.filter(seller_id=self.kwargs['pk'])
+    #     return context
     

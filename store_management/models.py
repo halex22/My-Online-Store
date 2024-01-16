@@ -32,7 +32,7 @@ class Seller(models.Model):
 
     name = models.CharField(max_length=50, unique=True)
     store_user = models.OneToOneField(
-        StoreUser, on_delete=models.CASCADE, related_name="user", blank=True)
+        StoreUser, on_delete=models.CASCADE, related_name="seller", blank=True)
     
     def __str__(self) -> str:
         return self.name

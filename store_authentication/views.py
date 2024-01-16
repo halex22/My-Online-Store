@@ -48,7 +48,7 @@ class SignUp(AuthenticationView):
         instnace = form.save()
         self.pk = instnace.pk
         login(self.request, instnace)
-        return redirect('home')
+        return redirect('home-store')
     
 
 class LogIn(LoginView):

@@ -2,7 +2,7 @@ from typing import Any
 from django.forms import BaseModelForm
 from django.contrib.auth import login
 from django.http import HttpRequest, HttpResponse
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, UpdateView
 from .aux_code import decorators
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -11,18 +11,21 @@ from .models import *
 from .forms import *
 
 
-class BaseCreate(CreateView):
+class SellerTest(UserPassesTestMixin):
 
-    @decorators.admit_only_sellers
-    def get(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
-        return super().get(request, *args, **kwargs)
+    def test_func(self) -> bool | None:
+        return self.request.user.is_seller
 
-    @decorators.admit_only_sellers
-    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
-        return super().post(request, *args, **kwargs)
+
+class BaseCreate(LoginRequiredMixin, SellerTest, CreateView):
+
+    login_url = reverse_lazy('log-in')
 
     @decorators.add_info_to_form(key_name='seller')
     def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.save()
+        self.success_url = reverse('product', kwargs={'pk': self.object.pk})
         return super().form_valid(form)
 
 
@@ -39,14 +42,12 @@ class AddElecView(BaseCreate):
     form_class = ElectronicModelForm
 
 
+# Update view section
+
+
 class MyBaseUpdate(LoginRequiredMixin, UpdateView):
+
     login_url = reverse_lazy('log-in')
-
-
-class SellerTest(UserPassesTestMixin):
-
-    def test_func(self) -> bool | None:
-        return self.request.user.is_seller
 
 
 class ProductOwnerTest(UserPassesTestMixin):
@@ -57,7 +58,13 @@ class ProductOwnerTest(UserPassesTestMixin):
 
 
 class MyUpdateView(Seller, ProductOwnerTest, MyBaseUpdate):
-    pass
+
+    @decorators.add_info_to_form(key_name='seller')
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.save()
+        self.success_url = reverse('product', kwargs={'pk': self.object.pk})
+        return super().form_valid(form)
 
 
 class EditFoodProduct(MyUpdateView):

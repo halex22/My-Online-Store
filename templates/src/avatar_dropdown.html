@@ -29,7 +29,7 @@
     {% if user.is_seller %}
     <li>
     <a
-      href=""
+      href="{% url 'seller-products' name=user.seller.name pk=user.seller.pk %}"
       class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white text-yellow-400"
       >My Products</a
     >

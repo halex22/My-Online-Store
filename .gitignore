@@ -7,6 +7,7 @@ __pycache__
 media
 _e_store
 node_modules
+uploads
 # Backup files # 
 *.bak 
 *.css

@@ -1,1 +1,32 @@
 {% extends "src/base.html" %}
+
+{% block title %}Home Page{% endblock title %}
+
+{% block content %}
+<div id="main-container" class="mx-4">
+	{% if no_products %}
+	<div class="text-center mt-12">
+		<p class="text-lg font-semibold">Looks like this seller has no product in the store</p>
+	</div>
+	{% else %}
+	<div id="list-container" class="grid grid-col-6 md:grid-col-6 lg:grid-cols-12">
+		{% for product in products %}
+		<div class="single-product-container mx-4 mt-4 md:col-span-3 lg:col-span-4">
+			{% include 'src/components/product_card.html'%}
+		</div>		
+		{% endfor %}
+	</div>
+	{% endif %}
+</div>
+
+<script>
+	const containers = document.getElementsByClassName('single-product-container');
+	for (const container of containers) {
+		container.addEventListener('click', () => {
+			const target = container.querySelector('.link-to-product');
+			target.click()
+		})
+	}
+</script>
+
+{% endblock content %}
