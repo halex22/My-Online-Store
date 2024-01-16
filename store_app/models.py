@@ -1,3 +1,37 @@
 from django.db import models
+from store_management.models import *
 
-# Create your models here.
+product_types = ['foodproduct', 'electronicproduct', 'fornitureproduct']
+
+class Cart(models.Model):
+    client = models.ForeignKey(StoreUser, on_delete=models.CASCADE)
+    products = models.ManyToManyField(BaseProduct, related_name = 'carts_products')
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, null=True, blank=True)
+
+    def calculate_total_price(self):
+        pass
+
+    def save(self, *args, **kwargs):
+        self.total_price = self.calculate_total_price()
+        super().save(*args, **kwargs)
+
+
+class CartItem(models.Model):
+    product = models.ForeignKey(BaseProduct, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    total_cost = models.PositiveIntegerField(null=True)
+
+    def save(self, *args, **kwargs):
+        self.total_cost = self.quantity * self.get_product_price()
+        return super().save(*args, **kwargs)
+    
+    def get_product_price(self):
+        for _ in product_types:
+            if hasattr(self.product, _):
+                instance = getattr(self.product, _)
+                return instance.price
+    
+
+class WishList(models.Model):
+    client = models.ForeignKey(StoreUser, on_delete=models.CASCADE)
+    products = models.ManyToManyField(BaseProduct, related_name = 'wished_products')

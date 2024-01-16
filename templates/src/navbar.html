@@ -10,11 +10,13 @@
     </section>
 
     <section id="p-list" class="col-span-3">
-      <ul class="flex justify-evenly">
-        <li class=""><a href="{% url 'add-new-food' %}">New Food Product</a></li>
-        <li class=""><a href="{% url 'add-new-electro' %}">New Electronic Product</a></li>
-        <li class=""><a href="{% url 'add-new-forni' %}">New Forniture Product</a></li>
-      </ul>
+      {% if  user.is_authenticated %}
+        <ul class="flex justify-evenly">
+          <li class=""><a href="{% url 'add-new-food' %}">New Food Product</a></li>
+          <li class=""><a href="{% url 'add-new-electro' %}">New Electronic Product</a></li>
+          <li class=""><a href="{% url 'add-new-forni' %}">New Forniture Product</a></li>
+        </ul>
+      {% endif %}
     </section>
 
     <section id="auth-section" class="col-span-1">
