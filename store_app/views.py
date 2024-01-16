@@ -37,6 +37,7 @@ class ProductView(DetailView):
             update_link = 'electro-update'
         else:
             actual_instance = instance.fornitureproduct
+            update_link = 'forniture-update'
         context['product'] = actual_instance
         context['product_type'] = actual_instance.__class__.__name__
         context['update_url'] = update_link

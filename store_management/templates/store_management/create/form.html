@@ -1,0 +1,49 @@
+<form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div id="inner-form-container" class="grid lg:grid-cols-2 sm:grid-cols-1  mx-20 mt-8 mb-4">
+      
+      {% for field in form %}
+        {% if field.widget_type != 'clearablefile' %}
+          <div class="field-container mb-6 text-center ">
+            
+            <div class="flex  items-center justify-center">              
+              {% if field.widget_type == 'text' %}
+                {% include 'src/form_inputs/text.html' %}
+              {% elif field.widget_type == 'checkbox' %}
+                {% include 'src/form_inputs/check_box.html' %}
+              {% elif field.widget_type == 'number' %}
+                {% include 'src/form_inputs/number.html' with step='0.01' max=999 min=0 %}
+              {% endif %}
+            </div>
+
+            {% if field.errors %}
+            <div class="help-text-container mt-2 flex justify-center text-sm text-red-400">
+              <ul class="error-list">
+              {% for error in field.errors %}                                
+                  <li>{{error|title}} </li>             
+              {% endfor %}
+              </ul>
+            </div>
+            {% else %}
+              {% if field.help_text %}
+                <div class="help-text-container mt-2 flex justify-center text-sm text-gray-400">
+                  {{field.help_text}}
+                </div>
+              {% endif %}
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+
+    </div>
+    {% for field in form %}
+      {% if field.widget_type == 'clearablefile' %}
+        <div class="file-upload-container mx-20 ">
+          {% include 'src/form_inputs/file.html' %}
+        </div>
+      {% endif %}
+  {% endfor %}
+  <div id="btn-container" class="flex justify-center my-4">
+    <button type="submit" class="text-white bg-blue-600 hover:bg-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 lg:w-80 md:w-40">Add new product</button>
+  </div>
+  </form>

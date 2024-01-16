@@ -11,12 +11,15 @@ from .models import *
 from .forms import *
 
 
+# common Mixins
 class SellerTest(UserPassesTestMixin):
 
     def test_func(self) -> bool | None:
         return self.request.user.is_seller
 
 
+# Create views
+    
 class BaseCreate(LoginRequiredMixin, SellerTest, CreateView):
 
     login_url = reverse_lazy('log-in')
@@ -29,7 +32,7 @@ class BaseCreate(LoginRequiredMixin, SellerTest, CreateView):
         return super().form_valid(form)
 
 
-# Create your views here.
+
 class AddFoodView(BaseCreate):
     template_name = 'store_management/create/food.html'
     model = FoodProduct
@@ -40,6 +43,12 @@ class AddElecView(BaseCreate):
     template_name = 'store_management/create/electro.html'
     model = ElectronicProduct
     form_class = ElectronicModelForm
+
+
+class AddFornView(BaseCreate):
+    template_name = 'store_management/create/forni.html'
+    model = FornitureProduct
+    form_class = ForniModelForm
 
 
 # Update view section
@@ -77,3 +86,9 @@ class EditElectroProduct(MyUpdateView):
     template_name = 'store_management/update/electro.html'
     model = ElectronicProduct
     form_class = ElectronicModelForm
+
+
+class EditForniProduct(MyUpdateView):
+    template_name = 'store_management/update/forni.html'
+    model = FornitureProduct
+    form_class = ForniModelForm

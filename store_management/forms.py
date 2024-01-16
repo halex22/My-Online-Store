@@ -7,8 +7,14 @@ from django.forms.utils import ErrorList
 from .models import *
 from django.forms import ModelForm
 
+help_texts = {
+            'name': 'Name must be unique, between 10 and 50 characters',
+            'price': "can't be 0€ or heigher than 999€",
+            'is_available': 'Unmark this is you are currently out of stock',
+            'is_local': 'If it was produced close to your location'
+        }
 
-class BaseProductForm(ModelForm):
+class BaseProductForm(ModelForm):       
 
     def save(self, commit: bool = True, *args, **kwargs) -> Any:
         self.instance.seller = self.data['seller']
@@ -21,12 +27,7 @@ class FoodModelForm(BaseProductForm):
         model = FoodProduct
         fields = ['name', 'price', 'is_local',
                   'is_available', 'img', 'description']
-        help_texts = {
-            'name': 'Name must be unique, between 10 and 50 characters',
-            'price': "can't be 0€ or heigher than 999€",
-            'is_available': 'Unmark this is you are currently out of stock',
-            'is_local': 'If it was produced close to your location'
-        }
+        help_texts = help_texts
 
 
 class ElectronicModelForm(BaseProductForm):
@@ -34,8 +35,12 @@ class ElectronicModelForm(BaseProductForm):
     class Meta:
         model = ElectronicProduct
         fields = ['name', 'price', 'is_available', 'img', 'description']
-        help_texts = {
-            'name': 'Name must be unique, between 10 and 50 characters',
-            'price': "can't be 0€ or heigher than 999€",
-            'is_available': 'Unmark this is you are currently out of stock',
-        }
+        help_texts = help_texts
+
+
+class ForniModelForm(BaseProductForm):
+    
+    class Meta:
+        model = FornitureProduct
+        fields = ['name', 'price', 'is_available', 'img', 'description']
+        help_texts = help_texts
