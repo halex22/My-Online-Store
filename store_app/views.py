@@ -14,23 +14,23 @@ from django.urls import reverse
 from .models import *
 # Create your views here.
 
+
 class HomeStore(TemplateView):
     template_name = 'store_app/index.html'
-
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['products'] = BaseProduct.objects.all()
         return context
-    
+
 
 class ProductView(DetailView):
     template_name = 'store_app/product.html'
     model = BaseProduct
     context_object_name = 'product'
-    
+
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context =  super().get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         instance = self.get_object()
         actual_instance = None
         update_link = None
@@ -44,16 +44,18 @@ class ProductView(DetailView):
             actual_instance = instance.fornitureproduct
             update_link = 'forniture-update'
         context['product'] = actual_instance
-        context['product_type'] = actual_instance.__class__.__name__ # I'm not using this 
+        # I'm not using this
+        context['product_type'] = actual_instance.__class__.__name__
         context['update_url'] = update_link
         context['is_in_wishlist'] = self.is_in_wishlist()
         return context
-    
+
     def is_in_wishlist(self):
         if self.request.user.is_authenticated:
-            wish, created = WishList.objects.get_or_create(client_id=self.request.user.id)
+            wish, created = WishList.objects.get_or_create(
+                client_id=self.request.user.id)
             return self.get_object() in wish.products.all()
-    
+
 
 class ProductsBySellerView(ListView):
     template_name = 'store_app/product_list.html'
@@ -71,9 +73,10 @@ class BaseSingleObjectMixin(LoginRequiredMixin, SingleObjectMixin):
     login_url = '/log-in'
 
     def get_object(self, queryset: QuerySet[Any] | None = ...) -> Model:
-        instance, created = self.model.objects.get_or_create(client_id=self.request.user.id)
+        instance, created = self.model.objects.get_or_create(
+            client_id=self.request.user.id)
         return instance
-    
+
 
 class MyObjectView(BaseSingleObjectMixin, TemplateView):
     """My view to get the `Cart` and `Wish List` objects"""
@@ -82,7 +85,6 @@ class MyObjectView(BaseSingleObjectMixin, TemplateView):
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
-
 
 
 class MyCartView(MyObjectView):
@@ -94,7 +96,7 @@ class MyWishView(MyObjectView):
     template_name = 'store_app/wish_list.html'
     model = WishList
     context_object_name = 'wish_list'
-    
+
 
 class RequirePostMixin:
     """Mixin that allows only `POST` requests"""
@@ -102,7 +104,6 @@ class RequirePostMixin:
     @method_decorator(require_POST)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
-    
 
 
 class BaseRequireView(RequirePostMixin, View):
@@ -116,7 +117,7 @@ class BaseRequireView(RequirePostMixin, View):
     def post(self, request: HttpRequest, *args, **kwargs):
         """Call the `set_object` first to avoid errorss"""
         return redirect(self.get_success_url())
-    
+
     def set_object(self, *args, **kwargs) -> BaseProduct:
         """
         Fetches the product instance using the `pk`
@@ -126,23 +127,26 @@ class BaseRequireView(RequirePostMixin, View):
         self.product = get_object_or_404(BaseProduct, pk=pk)
 
     def get_success_url(self, *args, **kwargs) -> str:
-        return reverse('product', kwargs={'pk':self.product.pk})
+        return reverse('product', kwargs={'pk': self.product.pk})
 
 # Add views
+
+
 class Add2Cart(LoginRequiredMixin, BaseRequireView):
     login_url = '/log-in'
     cart_item = None
     quantity = None
-    
+
     def post(self, request: HttpRequest, *args, **kwargs):
         self.set_object()
         self.get_desired_quantity()
         self.set_cart_item()
-        cart, created = Cart.objects.get_or_create(client_id=self.request.user.id)
+        cart, created = Cart.objects.get_or_create(
+            client_id=self.request.user.id)
         cart.products.add(self.cart_item)
         cart.save()
         return super().post(request, *args, **kwargs)
-    
+
     def get_desired_quantity(self, *args, **kwargs):
         self.quantity = int(self.request.POST['quantity'])
 
@@ -157,12 +161,12 @@ class Add2Cart(LoginRequiredMixin, BaseRequireView):
         self.cart_item.save()
 
 
-
 class Add2Wish(BaseRequireView):
 
-    def post(self,request: HttpRequest, *args, **kwargs):
+    def post(self, request: HttpRequest, *args, **kwargs):
         self.set_object()
-        list, created = WishList.objects.get_or_create(client_id=self.request.user.id)
+        list, created = WishList.objects.get_or_create(
+            client_id=self.request.user.id)
         list.products.add(self.product)
         return super().post(request, *args, **kwargs)
 
@@ -196,6 +200,7 @@ class RemoveFromCart(AccessTestMixin, BaseRemove):
     in and if the cart exits
     """
     test_model = Cart
+
     def post(self, request: HttpRequest, *args, **kwargs):
         self.set_object()
         item = CartItem.objects.get(product_id=self.product.pk)
@@ -204,7 +209,7 @@ class RemoveFromCart(AccessTestMixin, BaseRemove):
             item.delete()
             self.test_model_object.save()
         return super().post(request, *args, **kwargs)
-    
+
     def get_success_url(self, *args, **kwargs) -> str:
         return reverse('cart')
 
@@ -214,6 +219,5 @@ class RemoveFromWishList(AccessTestMixin, BaseRemove):
 
     def post(self, request: HttpRequest, *args, **kwargs):
         self.set_object()
-        print(self.set_object, self.test_model_object)
         self.test_model_object.products.remove(self.product)
         return super().post(request, *args, **kwargs)
