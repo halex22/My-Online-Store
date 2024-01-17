@@ -33,12 +33,14 @@ class Cart(models.Model):
         return total
 
     def save(self, *args, **kwargs):
-        self.total_price = self.calculate_total_price()
+        # when the cart is crated it has no prodcuts
+        # so only when it has some it will calculate the total_price
+        try:
+            self.total_price = self.calculate_total_price()
+        except:
+            pass
         super().save(*args, **kwargs)
 
-
-
-    
 
 class WishList(models.Model):
     client = models.ForeignKey(StoreUser, on_delete=models.CASCADE)

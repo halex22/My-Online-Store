@@ -10,6 +10,7 @@ urlpatterns = [
     # Cart views
     path('my-cart', view=MyCartView.as_view(), name='cart'),
     path('add-product-to-cart/<int:pk>', view=Add2Cart.as_view(), name='add-2-cart'),
+    path('remove-from-cart/<int:pk>', view=RemoveFromCart.as_view(), name='remove-from-cart'),
 
     # Wish List views
     path('my-wish-list/<int:pk>' , view=MyWishView.as_view(), name='wish-list'),

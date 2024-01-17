@@ -65,7 +65,6 @@ class MyCartView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         cart, created = Cart.objects.get_or_create(client_id=self.request.user.id)
-        cart.calculate_total_price()
         context['cart'] = cart
         return context
 
@@ -76,6 +75,7 @@ class MyWishView(LoginRequiredMixin, DetailView):
     
 
 class RequirePostMixin:
+    """Mixin that allows only POST requests"""
 
     @method_decorator(require_POST)
     def dispatch(self, request, *args, **kwargs):
@@ -84,10 +84,14 @@ class RequirePostMixin:
 
 
 class BaseRequireView(RequirePostMixin, View):
+    """
+    View that only accepts POST requests. Call the set_object method inside the post mothod at first place
+    """
 
     product = None
 
     def post(self, request: HttpRequest, *args, **kwargs):
+        """Call the set_object first to avoid errorss"""
         return redirect(self.get_success_url())
     
     def set_object(self, *args, **kwargs):
@@ -133,15 +137,24 @@ class Add2Wish(BaseRequireView):
         return super().post(request, *args, **kwargs)
 
 
-class BaseRemove(LoginRequiredMixin, View):
+class BaseRemove(LoginRequiredMixin, BaseRequireView):
+    """View that accepts only POST request if the user is authenticated"""
     login_url = '/log-in'
 
 
 class RemoveTest(UserPassesTestMixin):
-
+    """Mixin that checks if the cart exists"""
     def test_func(self) -> bool | None:
         return Cart.objects.get(client_id=self.request.user.id)
 
 
 class RemoveFromCart(RemoveTest, BaseRemove):
-    pass
+    """
+    View that handles only POST request if the user is logged
+    in and if the cart exits
+    """
+    
+    def post(self, request: HttpRequest, *args, **kwargs):
+        self.set_object()
+        print("got it ")
+        return super().post(request, *args, **kwargs)
