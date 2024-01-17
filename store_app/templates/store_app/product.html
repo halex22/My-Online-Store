@@ -1,6 +1,11 @@
 {% extends "src/base.html" %}
 {% load static %}
+{% load compress %}
 {% block title %}{{product.name|title}}{% endblock title %}
+
+{% block js_block %}
+<script src="{% static 'js/cart_wish.js' %}" defer></script>
+{% endblock js_block %}
 
 {% block content %}
 <div id="main-container">
@@ -32,15 +37,8 @@
 			</div>
 			{% include 'src/components/product/purchase.html' %}
 			{% include 'src/components/product/quantity.html' %}
+			{% include 'src/components/product/wish_list.html' %}
 
-			<script>
-				// form.preventDefault()
-				const btn = document.getElementById('cart-btn');
-				btn.addEventListener('click',  () => {
-					const form = document.getElementById('cart-form');
-					form.submit();
-				})
-			</script>
 			
 			<div id="rating" class="max-sm:flex justify-center mt-2">
 				{% include 'src/components/global_rating.html' %}

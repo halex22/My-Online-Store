@@ -1,9 +1,9 @@
-{% if is_in_wish %}
-<form action="{% url 'add-2-wish' pk=product.pk %}" method="post">
+{% if is_in_wishlist %}
+<form action="{% url 'remove-from-wish' pk=product.pk %}" method="post" id="wish-form">
     {% csrf_token %}
 </form>
 {% else %}
-<form action="{% url 'add-2-wish' pk=product.pk %}" method="post">
+<form action="{% url 'add-2-wish' pk=product.pk %}" method="post" id="wish-form">
     {% csrf_token %}
 </form>
 {% endif %}

@@ -1,8 +1,25 @@
 {% extends "src/base.html" %}
-
+{% load static %}
 {% block title %}My Wish List{% endblock title %}
 
-{% block content %}
+{% block js_block %}
+<script src="{% static 'js/card.js' %}" defer></script>
+{% endblock js_block %}
 
+{% block content %}
+<div id="main-container" class="mx-4 ">
+    <div id="header" class="text-center mt-2 mb-6">
+        <h2 class="text-3xl font-bold">My Wish List ⭐</h2>
+    </div>
+    <div class="grid grid-col-6 md:grid-col-6 lg:grid-cols-12">
+    {% for product in wish_list.products.all %}
+    <div class="single-product-container mx-4 mt-4 md:col-span-3 lg:col-span-4">
+        {% include 'src/components/product_card.html'%}
+    </div>	
+    {% endfor %}
+    </div>
+
+    
+</div>
 
 {% endblock content %}

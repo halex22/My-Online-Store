@@ -15,5 +15,7 @@ urlpatterns = [
     # Wish List views
     path('my-wish-list/' , view=MyWishView.as_view(), name='wish-list'),
     path('add-product-to-wish-list/<int:pk>', view=Add2Wish.as_view(), name='add-2-wish'),
+    path('remove-from-wish-list/<int:pk>', view=RemoveFromWishList.as_view(), name='remove-from-wish'),
+
 
 ]

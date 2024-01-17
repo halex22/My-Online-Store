@@ -8,7 +8,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet" />
 
 		{% block css_block %}{% endblock css_block %}
-		{% block js_block %}{% endblock js_block %}
+		{% block js_block %}
+    {% endblock js_block %}
 		{% compress css %}
 		<link rel="stylesheet" href="{% static 'src/output.css' %}">
 		{% endcompress %}

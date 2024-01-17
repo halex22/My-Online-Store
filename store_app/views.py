@@ -23,8 +23,6 @@ class HomeStore(TemplateView):
         context['products'] = BaseProduct.objects.all()
         return context
     
-class PreCart(View):
-    pass
 
 class ProductView(DetailView):
     template_name = 'store_app/product.html'
@@ -48,7 +46,13 @@ class ProductView(DetailView):
         context['product'] = actual_instance
         context['product_type'] = actual_instance.__class__.__name__ # I'm not using this 
         context['update_url'] = update_link
+        context['is_in_wishlist'] = self.is_in_wishlist()
         return context
+    
+    def is_in_wishlist(self):
+        if self.request.user.is_authenticated:
+            wish, created = WishList.objects.get_or_create(client_id=self.request.user.id)
+            return self.get_object() in wish.products.all()
     
 
 class ProductsBySellerView(ListView):
@@ -93,7 +97,7 @@ class MyWishView(MyObjectView):
     
 
 class RequirePostMixin:
-    """Mixin that allows only POST requests"""
+    """Mixin that allows only `POST` requests"""
 
     @method_decorator(require_POST)
     def dispatch(self, request, *args, **kwargs):
@@ -103,24 +107,28 @@ class RequirePostMixin:
 
 class BaseRequireView(RequirePostMixin, View):
     """
-    View that only accepts POST requests. Call the set_object method inside the post mothod at first place
+    View that only accepts `POST` requests. Call the `set_object` method inside the post mothod at first place
     """
 
     product = None
     redirect_url = None
 
     def post(self, request: HttpRequest, *args, **kwargs):
-        """Call the set_object first to avoid errorss"""
+        """Call the `set_object` first to avoid errorss"""
         return redirect(self.get_success_url())
     
-    def set_object(self, *args, **kwargs):
+    def set_object(self, *args, **kwargs) -> BaseProduct:
+        """
+        Fetches the product instance using the `pk`
+        :return: `BaseProduct` object
+        """
         pk = self.kwargs['pk']
         self.product = get_object_or_404(BaseProduct, pk=pk)
 
     def get_success_url(self, *args, **kwargs) -> str:
         return reverse('product', kwargs={'pk':self.product.pk})
 
-
+# Add views
 class Add2Cart(LoginRequiredMixin, BaseRequireView):
     login_url = '/log-in'
     cart_item = None
@@ -155,37 +163,57 @@ class Add2Wish(BaseRequireView):
     def post(self,request: HttpRequest, *args, **kwargs):
         self.set_object()
         list, created = WishList.objects.get_or_create(client_id=self.request.user.id)
-        # list.products.add(self.product)
+        list.products.add(self.product)
         return super().post(request, *args, **kwargs)
 
 
+# Remove views
 class BaseRemove(LoginRequiredMixin, BaseRequireView):
     """View that accepts only POST request if the user is authenticated"""
     login_url = '/log-in'
 
 
-class RemoveTest(UserPassesTestMixin):
-    """Mixin that checks if the cart exists"""
+class AccessTestMixin(UserPassesTestMixin):
+    """Mixin that checks if the `Cart` or `WishList` exists.
+    Set the `test_model` params when extending this class.
+    If the objects exits it is passed to the `test_model_object` param
+    """
+    test_model = None
+    test_model_object = None
+
     def test_func(self) -> bool | None:
-        return Cart.objects.get(client_id=self.request.user.id)
+        id = self.request.user.id
+        try:
+            self.test_model_object = self.test_model.objects.get(client_id=id)
+            return True
+        except:
+            return False
 
 
-class RemoveFromCart(RemoveTest, BaseRemove):
+class RemoveFromCart(AccessTestMixin, BaseRemove):
     """
     View that handles only POST request if the user is logged
     in and if the cart exits
     """
-    
+    test_model = Cart
     def post(self, request: HttpRequest, *args, **kwargs):
         self.set_object()
-        print(self.product)
         item = CartItem.objects.get(product_id=self.product.pk)
         if item:
-            cart = Cart.objects.get(client_id=self.request.user.id)
-            cart.products.remove(item)
+            self.test_model_object.products.remove(item)
             item.delete()
-            cart.save()
+            self.test_model_object.save()
         return super().post(request, *args, **kwargs)
     
     def get_success_url(self, *args, **kwargs) -> str:
         return reverse('cart')
+
+
+class RemoveFromWishList(AccessTestMixin, BaseRemove):
+    test_model = WishList
+
+    def post(self, request: HttpRequest, *args, **kwargs):
+        self.set_object()
+        print(self.set_object, self.test_model_object)
+        self.test_model_object.products.remove(self.product)
+        return super().post(request, *args, **kwargs)
