@@ -1,9 +1,10 @@
 from typing import Any
+from django.db.models.base import Model as Model
 from django.db.models.query import QuerySet
 from django.http import HttpRequest, HttpResponse, HttpResponse as HttpResponse
 from django.shortcuts import HttpResponse, redirect
 from django.views.generic import TemplateView, View, DetailView, ListView
-from django.views.generic.base import ContextMixin
+from django.views.generic.detail import SingleObjectMixin
 from django.views.decorators.http import require_POST
 from django.utils.decorators import method_decorator
 from store_management.models import BaseProduct
@@ -59,24 +60,36 @@ class ProductsBySellerView(ListView):
         return self.model.objects.filter(seller_id=self.kwargs['pk'])
 
 
-class MyCartView(LoginRequiredMixin, TemplateView):
-    template_name = 'store_app/cart.html'
+class BaseSingleObjectMixin(LoginRequiredMixin, SingleObjectMixin):
+    """Mix in that combines `LoginRequiredMixn` and fetches the instance of the model
+    using `get_or_create` query in the `get_object` method"""
+
+    login_url = '/log-in'
+
+    def get_object(self, queryset: QuerySet[Any] | None = ...) -> Model:
+        instance, created = self.model.objects.get_or_create(client_id=self.request.user.id)
+        return instance
     
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        cart, created = Cart.objects.get_or_create(client_id=self.request.user.id)
-        context['cart'] = cart
-        return context
+
+class MyObjectView(BaseSingleObjectMixin, TemplateView):
+    """My view to get the `Cart` and `Wish List` objects"""
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
 
 
-class MyWishView(LoginRequiredMixin, TemplateView):
+
+class MyCartView(MyObjectView):
+    template_name = 'store_app/cart.html'
+    model = Cart
+
+
+class MyWishView(MyObjectView):
     template_name = 'store_app/wish_list.html'
-
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        list, created = WishList.objects.get_or_create(client_id=self.request.user.id)
-        context['wish_list'] = list
-        return context
+    model = WishList
+    context_object_name = 'wish_list'
     
 
 class RequirePostMixin:
