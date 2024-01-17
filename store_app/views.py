@@ -69,9 +69,14 @@ class MyCartView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class MyWishView(LoginRequiredMixin, DetailView):
-    model = WishList
-    template_name = 'store_app/wish_list'
+class MyWishView(LoginRequiredMixin, TemplateView):
+    template_name = 'store_app/wish_list.html'
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        list, created = WishList.objects.get_or_create(client_id=self.request.user.id)
+        context['wish_list'] = list
+        return context
     
 
 class RequirePostMixin:
@@ -89,6 +94,7 @@ class BaseRequireView(RequirePostMixin, View):
     """
 
     product = None
+    redirect_url = None
 
     def post(self, request: HttpRequest, *args, **kwargs):
         """Call the set_object first to avoid errorss"""
@@ -134,6 +140,9 @@ class Add2Cart(LoginRequiredMixin, BaseRequireView):
 class Add2Wish(BaseRequireView):
 
     def post(self,request: HttpRequest, *args, **kwargs):
+        self.set_object()
+        list, created = WishList.objects.get_or_create(client_id=self.request.user.id)
+        # list.products.add(self.product)
         return super().post(request, *args, **kwargs)
 
 
@@ -156,5 +165,14 @@ class RemoveFromCart(RemoveTest, BaseRemove):
     
     def post(self, request: HttpRequest, *args, **kwargs):
         self.set_object()
-        print("got it ")
+        print(self.product)
+        item = CartItem.objects.get(product_id=self.product.pk)
+        if item:
+            cart = Cart.objects.get(client_id=self.request.user.id)
+            cart.products.remove(item)
+            item.delete()
+            cart.save()
         return super().post(request, *args, **kwargs)
+    
+    def get_success_url(self, *args, **kwargs) -> str:
+        return reverse('cart')

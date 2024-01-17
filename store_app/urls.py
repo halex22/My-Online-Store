@@ -13,7 +13,7 @@ urlpatterns = [
     path('remove-from-cart/<int:pk>', view=RemoveFromCart.as_view(), name='remove-from-cart'),
 
     # Wish List views
-    path('my-wish-list/<int:pk>' , view=MyWishView.as_view(), name='wish-list'),
+    path('my-wish-list/' , view=MyWishView.as_view(), name='wish-list'),
     path('add-product-to-wish-list/<int:pk>', view=Add2Wish.as_view(), name='add-2-wish'),
 
 ]

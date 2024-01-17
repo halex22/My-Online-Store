@@ -30,8 +30,8 @@
 					<a href="{% url 'seller-products' name=product.seller.name pk=product.seller.pk %}">{{product.seller.name|title}}</a>
 				</h4>
 			</div>
-			{% include 'src/components/purchase.html' %}
-			{% include 'store_app/quantity.html' %}
+			{% include 'src/components/product/purchase.html' %}
+			{% include 'src/components/product/quantity.html' %}
 
 			<script>
 				// form.preventDefault()

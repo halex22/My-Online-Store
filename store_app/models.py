@@ -35,8 +35,14 @@ class Cart(models.Model):
     def save(self, *args, **kwargs):
         # when the cart is crated it has no prodcuts
         # so only when it has some it will calculate the total_price
+        
         try:
-            self.total_price = self.calculate_total_price()
+            # self.total_price = self.calculate_total_price()
+            if self.products.all().__len__() == 0:
+                self.total_price = 0
+            else:
+                self.total_price = self.calculate_total_price()
+
         except:
             pass
         super().save(*args, **kwargs)
