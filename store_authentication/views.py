@@ -45,9 +45,7 @@ class SignUp(AuthenticationView):
     form_class = SingUpForm
     
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
-        instnace = form.save()
-        self.pk = instnace.pk
-        login(self.request, instnace)
+        login(**{'request':self.request, 'user': form.save()})
         return redirect('home-store')
     
 

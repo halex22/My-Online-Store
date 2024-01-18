@@ -51,3 +51,21 @@ class Cart(models.Model):
 class WishList(models.Model):
     client = models.ForeignKey(StoreUser, on_delete=models.CASCADE)
     products = models.ManyToManyField(BaseProduct, related_name = 'wished_products')
+
+
+class BaseModel(models.Model):
+    client = models.ForeignKey(StoreUser, on_delete= models.CASCADE)
+    added_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class Rating(BaseModel):
+    value = models.PositiveIntegerField()
+    product = models.ForeignKey(BaseProduct, on_delete=models.CASCADE, related_name='ratings')
+
+class Comment(BaseModel):
+    product = models.ForeignKey(BaseProduct, on_delete=models.CASCADE, related_name='comments')
+    rating = models.OneToOneField(Rating, on_delete=models.CASCADE, null=True, blank=True)
