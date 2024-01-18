@@ -10,7 +10,7 @@ from .models import *
 from .my_classes.remove import MyRemoveView
 from .my_classes.base import BaseRequireView
 from .my_classes.object import MyObjectView
-
+from .my_classes.rate import BaseRateView
 
 class HomeStore(TemplateView):
     template_name = 'store_app/index.html'
@@ -143,3 +143,10 @@ class RemoveFromWishList(MyRemoveView):
         self.set_object()
         self.test_model_object.products.remove(self.product)
         return super().post(request, *args, **kwargs)
+
+
+# Rating 
+class AddRatingView(BaseRateView):
+    template_name = 'store_app/rating_and_comment.html'
+    model = BaseProduct
+    context_object_name = 'product'

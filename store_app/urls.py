@@ -18,6 +18,6 @@ urlpatterns = [
     path('remove-from-wish-list/<int:pk>', view=RemoveFromWishList.as_view(), name='remove-from-wish'),
 
     # Rating and Comment
-    # path()
+    path('rate-and-comment/<int:pk>', view=AddRatingView.as_view(), name='rate-product'),
 
 ]

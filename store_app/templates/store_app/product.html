@@ -43,6 +43,7 @@
 			<div id="rating" class="max-sm:flex justify-center mt-2">
 				{% include 'src/components/global_rating.html' %}
 			</div> 
+			<div><p><a href="{% url 'rate-product' pk=product.pk %}">Rate this product</a></p></div>
 			<div class="flex mt-4 max-sm:justify-center">
 				<div class="me-4">
 					{% include 'src/components/check_x.html' with key='is local' state=product.is_local %}
