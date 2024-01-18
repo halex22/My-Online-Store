@@ -1,18 +1,15 @@
 from typing import Any
-from django.db.models.base import Model as Model
 from django.db.models.query import QuerySet
 from django.http import HttpRequest, HttpResponse, HttpResponse as HttpResponse
-from django.shortcuts import HttpResponse, redirect
-from django.views.generic import TemplateView, View, DetailView, ListView
-from django.views.generic.detail import SingleObjectMixin
-from django.views.decorators.http import require_POST
-from django.utils.decorators import method_decorator
+from django.shortcuts import HttpResponse
+from django.views.generic import TemplateView, DetailView, ListView
 from store_management.models import BaseProduct
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.shortcuts import get_object_or_404
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from .models import *
-# Create your views here.
+from .my_classes.remove import MyRemoveView
+from .my_classes.base import BaseRequireView
+from .my_classes.object import MyObjectView
 
 
 class HomeStore(TemplateView):
@@ -66,27 +63,7 @@ class ProductsBySellerView(ListView):
         return self.model.objects.filter(seller_id=self.kwargs['pk'])
 
 
-class BaseSingleObjectMixin(LoginRequiredMixin, SingleObjectMixin):
-    """Mix in that combines `LoginRequiredMixn` and fetches the instance of the model
-    using `get_or_create` query in the `get_object` method"""
-
-    login_url = '/log-in'
-
-    def get_object(self, queryset: QuerySet[Any] | None = ...) -> Model:
-        instance, created = self.model.objects.get_or_create(
-            client_id=self.request.user.id)
-        return instance
-
-
-class MyObjectView(BaseSingleObjectMixin, TemplateView):
-    """My view to get the `Cart` and `Wish List` objects"""
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        context = self.get_context_data(object=self.object)
-        return self.render_to_response(context)
-
-
+# Object views
 class MyCartView(MyObjectView):
     template_name = 'store_app/cart.html'
     model = Cart
@@ -98,40 +75,7 @@ class MyWishView(MyObjectView):
     context_object_name = 'wish_list'
 
 
-class RequirePostMixin:
-    """Mixin that allows only `POST` requests"""
-
-    @method_decorator(require_POST)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
-
-
-class BaseRequireView(RequirePostMixin, View):
-    """
-    View that only accepts `POST` requests. Call the `set_object` method inside the post mothod at first place
-    """
-
-    product = None
-    redirect_url = None
-
-    def post(self, request: HttpRequest, *args, **kwargs):
-        """Call the `set_object` first to avoid errorss"""
-        return redirect(self.get_success_url())
-
-    def set_object(self, *args, **kwargs) -> BaseProduct:
-        """
-        Fetches the product instance using the `pk`
-        :return: `BaseProduct` object
-        """
-        pk = self.kwargs['pk']
-        self.product = get_object_or_404(BaseProduct, pk=pk)
-
-    def get_success_url(self, *args, **kwargs) -> str:
-        return reverse('product', kwargs={'pk': self.product.pk})
-
 # Add views
-
-
 class Add2Cart(LoginRequiredMixin, BaseRequireView):
     login_url = '/log-in'
     cart_item = None
@@ -161,7 +105,7 @@ class Add2Cart(LoginRequiredMixin, BaseRequireView):
         self.cart_item.save()
 
 
-class Add2Wish(BaseRequireView):
+class Add2Wish(LoginRequiredMixin, BaseRequireView):
 
     def post(self, request: HttpRequest, *args, **kwargs):
         self.set_object()
@@ -172,29 +116,7 @@ class Add2Wish(BaseRequireView):
 
 
 # Remove views
-class BaseRemove(LoginRequiredMixin, BaseRequireView):
-    """View that accepts only POST request if the user is authenticated"""
-    login_url = '/log-in'
-
-
-class AccessTestMixin(UserPassesTestMixin):
-    """Mixin that checks if the `Cart` or `WishList` exists.
-    Set the `test_model` params when extending this class.
-    If the objects exits it is passed to the `test_model_object` param
-    """
-    test_model = None
-    test_model_object = None
-
-    def test_func(self) -> bool | None:
-        id = self.request.user.id
-        try:
-            self.test_model_object = self.test_model.objects.get(client_id=id)
-            return True
-        except:
-            return False
-
-
-class RemoveFromCart(AccessTestMixin, BaseRemove):
+class RemoveFromCart(MyRemoveView):
     """
     View that handles only POST request if the user is logged
     in and if the cart exits
@@ -214,7 +136,7 @@ class RemoveFromCart(AccessTestMixin, BaseRemove):
         return reverse('cart')
 
 
-class RemoveFromWishList(AccessTestMixin, BaseRemove):
+class RemoveFromWishList(MyRemoveView):
     test_model = WishList
 
     def post(self, request: HttpRequest, *args, **kwargs):
