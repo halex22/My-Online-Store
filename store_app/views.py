@@ -7,10 +7,11 @@ from store_management.models import BaseProduct
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from .models import *
+from .forms import RateAndCommetForm
 from .my_classes.remove import MyRemoveView
 from .my_classes.base import BaseRequireView
 from .my_classes.object import MyObjectView
-from .my_classes.rate import BaseRateView
+from .my_classes.rate import RateView
 
 class HomeStore(TemplateView):
     template_name = 'store_app/index.html'
@@ -146,7 +147,8 @@ class RemoveFromWishList(MyRemoveView):
 
 
 # Rating 
-class AddRatingView(BaseRateView):
+class AddRatingView(RateView):
     template_name = 'store_app/rating_and_comment.html'
     model = BaseProduct
     context_object_name = 'product'
+    

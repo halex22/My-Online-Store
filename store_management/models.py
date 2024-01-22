@@ -64,6 +64,15 @@ class BaseProduct(models.Model):
         self.modified_date = now()
         return super().save(*args, **kwargs)
     
+    def update_rating(self, rating: int):
+        """Method that update the rating of the product. At the end is calles the save method
+        :@params `rating` - the value racieved from the form 
+        """
+        self.n_votes += 1
+        self.total_score += rating
+        self.rating = self.total_score / self.n_votes
+        self.save()
+    
     def __str__(self) -> str:
         return self.name
 

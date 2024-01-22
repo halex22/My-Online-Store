@@ -70,4 +70,4 @@ class Rating(BaseModel):
 class Comment(BaseModel):
     product = models.ForeignKey(BaseProduct, on_delete=models.CASCADE, related_name='comments')
     rating = models.OneToOneField(Rating, on_delete=models.CASCADE, null=True, blank=True)
-    text = models.TextField()
+    text = models.TextField(null=True)

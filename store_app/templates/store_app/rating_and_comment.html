@@ -5,7 +5,74 @@
 
 
 {% block content %}
-<div id="main-container">
+<div id="main-container" class="mx-4">
+	<div id="inner-container" class="grid grid-cols-2 mt-8">
 
+		<section id="product-info" class="md:col-span-1 max-sm:col-span-2">
+			<header class="text-center font-semibold text-2xl"><h2>{{product.name|title}}</h2></header>
+			<div id="img-container" class="flex justify-center ">
+				<img src="{{product.img.url}}" alt="{{product.name}} img" class="w-auto max-h-80">
+			</div>
+			<div>
+				<p>price: </p>
+			</div>
+			
+		</section>
+
+		<section id="rating-comment" class="md:col-span-1 max-sm:col-span-2 mx-4">
+			<header class="text-center font-semibold text-2xl "><h2>Let us know your opinion</h2></header>
+			<p class="mt-4">
+			Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatum cumque maiores quam assumenda
+			cupiditate voluptatem ullam dolorem animi? Itaque ab eaque 
+			maiores ex reprehenderit voluptas sequi culpa molestias. Commodi, perspiciatis?
+			</p>
+			<div id="outer-form-container" class="mt-8">
+				<form action="" method="post">
+					{% csrf_token %}
+					{% with field=form.value %}
+						<span class="mr-2">How many stars would you give to this product</span>
+						<input
+						type="number"
+						name="{{field.name}}"
+						id="{{field.id_for_label}}"
+						placeholder="1"
+						max="5"
+						min="1"
+						value="1"
+						{% include 'src/form_inputs/class.html' %}
+						/>
+						<svg
+							class="w-4 h-4 text-yellow-300 inline"
+							aria-hidden="true"
+							xmlns="http://www.w3.org/2000/svg"
+							fill="currentColor"
+							viewBox="0 0 22 20"
+						>
+							<path
+								d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"
+							/>
+						</svg>
+					{% endwith %}
+					
+					<label for="{{form.text.id_for_label}}" class="block my-4 text-sm font-medium text-gray-900 ">
+						If you feel like, please leave a comment
+					</label>
+					<textarea
+						id="{{form.text.id_for_label}}"
+						name="{{form.text.name}}"
+						rows="4"
+						class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+						placeholder="Write your thoughts here..."
+						name=""
+					></textarea>
+
+					<div class="text-center mt-6">
+						<button type="submit" class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 ">Save</button>
+					</div>	
+					</label>
+				</form>
+			</div>
+		</section>
+	</div>
 </div>
 {% endblock content %}

@@ -1,10 +1,14 @@
 from typing import Any
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.db.models.base import Model as Model
-from django.db.models.query import QuerySet
-from django.views.generic.detail import SingleObjectMixin, DetailView, BaseDetailView
-from django.views.generic import TemplateView
+from django.http import HttpResponse
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.views.generic.detail import BaseDetailView
+from django.views.generic.edit import FormMixin
 from django.views.generic.base import TemplateResponseMixin
+from ..forms import RateAndCommetForm
+from ..models import Rating, Comment
 
 
 class CanRate(UserPassesTestMixin):
@@ -27,5 +31,46 @@ class BaseRateView(BaseMixins, BaseDetailView, TemplateResponseMixin):
     an object and the desired template
     """
 
-class RateView(BaseRateView):
-    pass
+
+class RateCommentMixin(FormMixin):
+    form_class = RateAndCommetForm
+
+
+class RateView(BaseRateView, RateCommentMixin):
+
+    product = None
+
+    def post(self, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form=form)
+        else:
+            return self.form_invalid(form=form)
+
+    def form_invalid(self, form: Any) -> HttpResponse:
+        errors = form.errors.as_data()
+        print(errors)
+        return redirect('rate-product', pk=3)
+
+    def form_valid(self, form: Any) -> HttpResponse:
+        self.product = self.get_object()
+        data = form.data.copy()
+        base_kwargs = self.get_object_and_user()
+        base_kwargs.update({'value': data['value']})
+        rating = Rating(**base_kwargs)
+        rating.save()
+        if data['text'] == '':
+            return redirect('product', pk=self.product.pk)
+        else:
+            base_kwargs.pop('value')
+            base_kwargs.update({'text': data['text'], 'rating_id':rating.pk})
+            commet = Comment(**base_kwargs)
+            commet.save()
+            return redirect('product', pk=self.product.pk)
+
+    def get_object_and_user(self):
+        return {'client_id': self.request.user.id, 'product_id': self.product.pk}
+    
+    def update_product_rating(self, rating:int):
+        self.product
+
