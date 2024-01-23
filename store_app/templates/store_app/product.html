@@ -5,6 +5,7 @@
 
 {% block js_block %}
 <script src="{% static 'js/cart_wish.js' %}" defer></script>
+<script src="{% static 'js/comments.js' %}" defer></script>
 {% endblock js_block %}
 
 {% block content %}
@@ -39,11 +40,25 @@
 			{% include 'src/components/product/quantity.html' %}
 			{% include 'src/components/product/wish_list.html' %}
 
-			
+			{% if rating %}
+			<div class="">
+				<span>Your rating:</span>
+				<div>{% include 'src/components/global_rating.html' with rating=rating.value %}</div>
+				
+			</div>
+			{% else %}
+			<div>
+				<p><a href="{% url 'rate-product' pk=product.pk %}">Rate this product</a></p>
+			</div>
+
+			{% endif %}
+
 			<div id="rating" class="max-sm:flex justify-center mt-2">
-				{% include 'src/components/global_rating.html' %}
+				<span>Global rating</span>
+				<div>{% include 'src/components/global_rating.html' with rating=product.rating%}</div>				
 			</div> 
-			<div><p><a href="{% url 'rate-product' pk=product.pk %}">Rate this product</a></p></div>
+
+
 			<div class="flex mt-4 max-sm:justify-center">
 				<div class="me-4">
 					{% include 'src/components/check_x.html' with key='is local' state=product.is_local %}
@@ -95,7 +110,10 @@
 					{% include 'src/components/detail_rating.html'%}
 				</div>
 			</div>
-			<div class="md:col-span-3 max-sm:mt-4">
+			<div class="md:col-span-3 max-sm:mt-4" id="comment-container">
+				{% include 'src/components/product/comment_placeholder.html' %}
+				{% include 'src/components/product/comment_placeholder.html' %}
+
 				{% include 'src/components/raiting_comment.html'%}
 			</div>
 		</div>

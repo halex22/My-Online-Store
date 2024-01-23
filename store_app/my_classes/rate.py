@@ -16,7 +16,9 @@ class CanRate(UserPassesTestMixin):
 
     def test_func(self) -> bool | None:
         # latter change this to check if the user has bought the item
-        return True
+        has_bought_item = True
+        new_date = True
+        return all((has_bought_item, new_date))
 
 
 class BaseMixins(LoginRequiredMixin, CanRate):
@@ -59,18 +61,17 @@ class RateView(BaseRateView, RateCommentMixin):
         base_kwargs.update({'value': data['value']})
         rating = Rating(**base_kwargs)
         rating.save()
-        if data['text'] == '':
-            return redirect('product', pk=self.product.pk)
-        else:
+        if data['text'] != '':
             base_kwargs.pop('value')
             base_kwargs.update({'text': data['text'], 'rating_id':rating.pk})
             commet = Comment(**base_kwargs)
             commet.save()
-            return redirect('product', pk=self.product.pk)
+        self.product.update_rating(int(data['value']))
+        return redirect('product', pk=self.product.pk)
 
     def get_object_and_user(self):
         return {'client_id': self.request.user.id, 'product_id': self.product.pk}
     
-    def update_product_rating(self, rating:int):
-        self.product
+    # def update_product_rating(self, rating:int):
+    #     self.update_product_rating
 

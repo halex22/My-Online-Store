@@ -19,5 +19,5 @@ urlpatterns = [
 
     # Rating and Comment
     path('rate-and-comment/<int:pk>', view=AddRatingView.as_view(), name='rate-product'),
-
+    path('fetch-comments/<int:pk>', view= FetchComments.as_view(), name='fetch-comments'),
 ]

@@ -1,8 +1,10 @@
-from typing import Any
+from typing import Any, Union, List
+import json
 from django.db.models.query import QuerySet
 from django.http import HttpRequest, HttpResponse, HttpResponse as HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import HttpResponse
-from django.views.generic import TemplateView, DetailView, ListView
+from django.views.generic import TemplateView, DetailView, ListView, View
 from store_management.models import BaseProduct
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
@@ -26,10 +28,11 @@ class ProductView(DetailView):
     template_name = 'store_app/product.html'
     model = BaseProduct
     context_object_name = 'product'
+    object = None
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        instance = self.get_object()
+        instance = self.object
         actual_instance = None
         update_link = None
         if hasattr(instance, 'foodproduct'):
@@ -46,6 +49,8 @@ class ProductView(DetailView):
         context['product_type'] = actual_instance.__class__.__name__
         context['update_url'] = update_link
         context['is_in_wishlist'] = self.is_in_wishlist()
+        
+        context['rating'] = self.get_rating()
         return context
 
     def is_in_wishlist(self):
@@ -53,6 +58,15 @@ class ProductView(DetailView):
             wish, created = WishList.objects.get_or_create(
                 client_id=self.request.user.id)
             return self.get_object() in wish.products.all()
+        
+    def get_rating(self) -> Union[Rating, None]:
+        """If the product has been rated by the user it returns the instance of the `Rating` class
+        else return `None` """
+        try:
+            return Rating.objects.get(client_id=self.request.user.id, product_id=self.object.pk)
+        except:
+            return None
+        
 
 
 class ProductsBySellerView(ListView):
@@ -152,3 +166,37 @@ class AddRatingView(RateView):
     model = BaseProduct
     context_object_name = 'product'
     
+
+
+class FetchComments(View):
+
+    response = None
+    product_pk = None
+
+    def get(self, *args, **kwargs):
+        self.product_pk = self.kwargs['pk']
+        if self.has_comments():
+            comments = Comment.objects.filter(product_id=self.product_pk)
+            self.data_response(comments=comments)
+        else:
+            self.no_data_response()
+        return JsonResponse(json.loads(self.response), safe=False)
+    
+    def no_data_response(self):
+        self.response = json.dumps({'found': 0, 'data':{}})
+
+    def data_response(self, comments: List[Comment]):
+        response = {'found':1, 'data': {}}
+        new_data = {}
+        for comment in comments:
+            new_data.update({f'{comment.pk}': {
+                'name': comment.client.username.capitalize(),
+                'date': comment.added_date.strftime("%Y-%m-%d %H:%M:%S"),
+                'rating': comment.rating.value,
+                'text': comment.text
+            }})
+        response['data'].update(new_data)
+        self.response = json.dumps(response)
+
+    def has_comments(self):
+        return Comment.objects.filter(product_id=self.product_pk).exists()

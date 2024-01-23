@@ -17,7 +17,7 @@
         {{product.name|title}}
       </h5>
     </a>
-    {% include 'src/components/global_rating.html' %}
+    {% include 'src/components/global_rating.html' with rating=product.rating%}
     <div class="flex items-center justify-between mt-4">
       <span class="text-3xl font-bold text-gray-900 dark:text-white">
         {{product.foodproduct.price}}
