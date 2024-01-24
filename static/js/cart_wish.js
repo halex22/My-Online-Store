@@ -17,3 +17,10 @@ wishBtn.addEventListener('click', () => {
     const form = document.getElementById('wish-form');
     form.submit();
 });
+
+const rateBtns = document.querySelectorAll('.rate-btn');
+rateBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+        btn.querySelector('a').click()
+    })
+} )

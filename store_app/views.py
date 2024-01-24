@@ -15,6 +15,18 @@ from .my_classes.base import BaseRequireView
 from .my_classes.object import MyObjectView
 from .my_classes.rate import RateView
 
+def get_actual_instance_price(instance) -> str:
+    actual_instance = None
+    if hasattr(instance, 'foodproduct'):
+            actual_instance = instance.foodproduct
+    elif hasattr(instance, 'electronicproduct'):
+        actual_instance = instance.electronicproduct
+    else:
+        actual_instance = instance.fornitureproduct
+    return str(actual_instance.price)
+
+
+
 class HomeStore(TemplateView):
     template_name = 'store_app/index.html'
 
@@ -45,8 +57,6 @@ class ProductView(DetailView):
             actual_instance = instance.fornitureproduct
             update_link = 'forniture-update'
         context['product'] = actual_instance
-        # I'm not using this
-        context['product_type'] = actual_instance.__class__.__name__
         context['update_url'] = update_link
         context['is_in_wishlist'] = self.is_in_wishlist()
         
@@ -167,23 +177,26 @@ class AddRatingView(RateView):
     context_object_name = 'product'
     
 
-
-class FetchComments(View):
-
+class BaseJsonResponseView(View):
     response = None
-    product_pk = None
+    object_pk = None
+
+    def no_data_response(self):
+        self.response = json.dumps({'found': 0, 'data':{}})
 
     def get(self, *args, **kwargs):
-        self.product_pk = self.kwargs['pk']
+        return JsonResponse(json.loads(self.response), safe=False)
+
+class FetchComments(BaseJsonResponseView):
+
+    def get(self, *args, **kwargs):
+        self.object_pk = self.kwargs['pk']
         if self.has_comments():
-            comments = Comment.objects.filter(product_id=self.product_pk)
+            comments = Comment.objects.filter(product_id=self.object_pk)
             self.data_response(comments=comments)
         else:
             self.no_data_response()
-        return JsonResponse(json.loads(self.response), safe=False)
-    
-    def no_data_response(self):
-        self.response = json.dumps({'found': 0, 'data':{}})
+        return super().get(self, *args, **kwargs)
 
     def data_response(self, comments: List[Comment]):
         response = {'found':1, 'data': {}}
@@ -199,4 +212,49 @@ class FetchComments(View):
         self.response = json.dumps(response)
 
     def has_comments(self):
-        return Comment.objects.filter(product_id=self.product_pk).exists()
+        return Comment.objects.filter(product_id=self.object_pk).exists()
+    
+
+class MoreProductFromSeller(BaseJsonResponseView):
+
+    product_pk = None
+    query_set = None
+
+    def get(self, *args, **kwargs):
+        self.set_pks()
+        self.fetch_products()
+        if self.query_set:
+            self.data_response()
+        else:
+            self.no_data_response()
+        return super().get(*args, **kwargs)
+
+    def fetch_products(self):
+        result = BaseProduct.objects.filter(seller_id=self.object_pk).exclude(pk=self.product_pk)
+        if result.count() > 3:
+            shuffled_queryset = result.order_by('?')
+            self.query_set = shuffled_queryset[:3]
+        else:
+            self.query_set = result
+
+
+    def set_pks(self):
+        self.object_pk = self.kwargs['s_pk']
+        self.product_pk = self.kwargs['p_pk']
+    
+    def data_response(self):
+        response = {'found':1, 'data': {}}
+        new_data = {}
+        for product in self.query_set:
+            new_data.update({f'{product.pk}': {
+                'name': product.name,
+                'img': product.img.url,
+                'link': reverse('product', kwargs={'pk':product.pk}),
+                'price': get_actual_instance_price(product)
+            }})
+        response['data'].update(new_data)
+        self.response = json.dumps(response)
+
+
+
+

@@ -11,13 +11,24 @@
     <div id="header" class="text-center mt-2 mb-6">
         <h2 class="text-3xl font-bold">My Wish List ⭐</h2>
     </div>
-    <div class="grid grid-col-6 md:grid-col-6 lg:grid-cols-12">
-    {% for product in wish_list.products.all %}
-    <div class="single-product-container mx-4 mt-4 md:col-span-3 lg:col-span-4">
-        {% include 'src/components/product_card.html'%}
-    </div>	
-    {% endfor %}
+    {% if wish_list.products.all %}
+        <div class="grid grid-col-6 md:grid-col-6 lg:grid-cols-12">
+            {% for product in wish_list.products.all %}
+                <div class="single-product-container mx-4 mt-4 md:col-span-3 lg:col-span-4">
+                    {% include 'src/components/product_card.html'%}
+                </div>	
+            {% endfor %}
+        </div>
+    {% else %}
+    <div class="flex justify-center mt-4">
+        <img class=" w-auto max-h-80" src="/media/defaults/empty_list.jpg" alt="">
     </div>
+    <div class="text-center">
+        <p class="text-2xl font-semibold">Your wish list is empty</p>
+    </div>
+    {% endif %}
+
+    
 
     
 </div>

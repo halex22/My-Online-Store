@@ -6,6 +6,8 @@
 {% block js_block %}
 <script src="{% static 'js/cart_wish.js' %}" defer></script>
 <script src="{% static 'js/comments.js' %}" defer></script>
+<script src="{% static 'js/other_products.js' %}" defer></script>
+
 {% endblock js_block %}
 
 {% block content %}
@@ -47,8 +49,10 @@
 				
 			</div>
 			{% else %}
-			<div>
-				<p><a href="{% url 'rate-product' pk=product.pk %}">Rate this product</a></p>
+			<div id="rate-product" class="text-center my-4">
+				<button class="bg-green-500 rounded-lg border-green-700 p-2 rate-btn">
+					<a class="text-white font-semibold" href="{% url 'rate-product' pk=product.pk %}">Rate this product</a>
+				</button>
 			</div>
 
 			{% endif %}
@@ -102,9 +106,9 @@
 		</section>
 	</div>
 
-	<section id="comment-section" class="mt-6 px-4 ">
-		<header><h2 class="font-bold">Comments</h2></header>
-		<div id="comment-and-raiting" class=" md:grid grid-cols-6">
+	<section id="comment-section" class="mt-8 px-4 ">
+		<header><h2 class="font-bold text-2xl">Comments</h2></header>
+		<div id="comment-and-raiting" class=" md:grid grid-cols-6 mb-4">
 			<div class="md:col-span-3 mt-4 sm:mb-4 ">
 				<div class="max-sm:px-4">
 					{% include 'src/components/detail_rating.html'%}
@@ -112,11 +116,23 @@
 			</div>
 			<div class="md:col-span-3 max-sm:mt-4" id="comment-container">
 				{% include 'src/components/product/comment_placeholder.html' %}
-				{% include 'src/components/product/comment_placeholder.html' %}
 
-				{% include 'src/components/raiting_comment.html'%}
 			</div>
+
+			
 		</div>
+	</section>
+
+	<section class="max-sm:flex flex-col items-center md:block md:mx-4 mb-4">
+		<header><h2 class="font-bold text-2xl">Other products you may like</h2></header>
+		<div id="other-products" class="md:grid grid-cols-3">
+			<a id="moreProductsUrl" href="{% url 'more-products' s_pk=product.seller.pk p_pk=product.pk %}"></a>
+		</div>
+		<div id="card-placeholders" class="md:grid grid-cols-3 mx-4 mb-4">
+			<div class="col-span-1">{% include 'src/components/product/card_placeholder.html'%}</div>
+			<div class="col-span-1">{% include 'src/components/product/card_placeholder.html'%}</div>
+		</div>
+
 	</section>
 </div>
 

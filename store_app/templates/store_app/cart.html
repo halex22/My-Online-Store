@@ -5,7 +5,8 @@
 
 {% block content %}
 <div id="main-container" class="mx-4 px-4">
-
+	
+	{% if cart.products.all %}
 	<div class="grid grid-cols-5 mt-4">
 		<section id="product-section" class="col-span-3 mx-4">
 			<header>
@@ -65,8 +66,14 @@
 
 		</section>
 	</div>
-	
-
+	{% else %}
+	<section>
+		<header class="text-center"><span class="sr-only">No items</span></header>
+		<div class="flex justify-center">
+			<img src="/media/defaults/empty-cart.png" alt="">
+		</div>
+	</section>
+	{% endif %}
 
 </div>
 

@@ -42,6 +42,7 @@ class CommentFetcher {
 class CommentManager {
   static fetchComments = true;
   static starSvg = document.getElementById("example-star");
+
   static async init() {
     if (!CommentManager.fetchComments) {
       return;
@@ -62,6 +63,8 @@ class CommentManager {
         commentContainer.append(article);
       }
     } else {
+      const noComments = CommentManager.noComments();
+      commentContainer.append(noComments);
     }
     CommentManager.starSvg.remove();
     CommentManager.fetchComments = false;
@@ -145,6 +148,15 @@ class CommentManager {
     for (const item of [...placeHolders]) {
       item.remove();
     }
+  }
+
+  static noComments() {
+    const div = CommentManager.createDiv('my-4')
+    div.innerHTML = `
+      <p class="sm:text-xl md:text-2xl font-semibold text-center">So far nobody has rated or commented this product</p>
+      <p class="sm:text-xl md:text-2xl font-semibold text-center">Be the first One 😉</p>
+    `
+    return div
   }
 }
 
