@@ -11,14 +11,18 @@
 		<p class="text-lg font-semibold">Looks like this seller has no product in the store</p>
 	</div>
 	{% else %}
-	<div id="list-container" class="grid grid-col-6 md:grid-col-6 lg:grid-cols-12">
+	<div id="list-container" class=" md:grid lg:grid-cols-12">
 		{% for product in products %}
-		<div class="single-product-container mx-4 mt-4 md:col-span-3 lg:col-span-4">
+		<div class="single-product-container mx-4 mt-4 md:col-span-6 flex justify-center">
 			{% include 'src/components/product_card.html'%}
 		</div>		
 		{% endfor %}
 	</div>
 	{% endif %}
+</div>
+
+<div class="m-4 flex justify-center">
+	{% include 'store_app/pagination.html' %}
 </div>
 
 <script>

@@ -6,6 +6,7 @@ urlpatterns = [
     path('', view=HomeStore.as_view(), name='home-store'),
     path('product/<int:pk>', view=ProductView.as_view(), name='product'),
     path('products/<str:name>-<int:pk>', view=ProductsBySellerView.as_view(), name='seller-products'),
+    path('search/products', view=SearchProductsView.as_view(), name='search'),
 
     # Cart views
     path('my-cart', view=MyCartView.as_view(), name='cart'),
@@ -20,5 +21,7 @@ urlpatterns = [
     # Rating and Comment
     path('rate-and-comment/<int:pk>', view=AddRatingView.as_view(), name='rate-product'),
     path('fetch-comments/<int:pk>', view= FetchComments.as_view(), name='fetch-comments'),
-    path('fetch-more-product/<int:s_pk>/<int:p_pk>', view=MoreProductFromSeller.as_view(), name='more-products')
+    path('fetch-more-product/<int:s_pk>/<int:p_pk>', view=MoreProductFromSeller.as_view(), name='more-products'),
+    path('fetch-cart-products', view=GetCartNumber.as_view(), name='cart-number')
+
 ]

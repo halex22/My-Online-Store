@@ -8,8 +8,10 @@ from django.views.generic import TemplateView, DetailView, ListView, View
 from store_management.models import BaseProduct
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
+from django.db.models import Q
 from .models import *
 from .forms import RateAndCommetForm
+from django.core.paginator import Paginator
 from .my_classes.remove import MyRemoveView
 from .my_classes.base import BaseRequireView
 from .my_classes.object import MyObjectView
@@ -27,14 +29,27 @@ def get_actual_instance_price(instance) -> str:
 
 
 
-class HomeStore(TemplateView):
+class HomeStore(ListView):
+    model = BaseProduct
+    paginate_by = 6
     template_name = 'store_app/index.html'
 
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        context['products'] = BaseProduct.objects.all()
-        return context
 
+class SearchProductsView(ListView):
+    model = BaseProduct
+    template_name = 'store_app/search_products.html'
+    context_object_name = 'products'
+        
+    def get_user_query(self):
+        q = self.request.get_full_path_info().split('=')[1]
+        return q
+    
+    def get_queryset(self) -> QuerySet[Any]:
+        user_query = self.get_user_query()
+        return BaseProduct.objects.filter(
+            Q(name__icontains= user_query) |
+            Q(seller__name__icontains = user_query)
+        )
 
 class ProductView(DetailView):
     template_name = 'store_app/product.html'
@@ -83,6 +98,7 @@ class ProductsBySellerView(ListView):
     template_name = 'store_app/product_list.html'
     model = BaseProduct
     context_object_name = 'products'
+    paginate_by = 4
 
     def get_queryset(self) -> QuerySet[Any]:
         return self.model.objects.filter(seller_id=self.kwargs['pk'])
@@ -255,6 +271,28 @@ class MoreProductFromSeller(BaseJsonResponseView):
         response['data'].update(new_data)
         self.response = json.dumps(response)
 
+
+class GetCartNumber(View):
+
+    client_id = None
+    cart = None
+    cart_len = None
+
+    def get(self, *args, **kwargs):
+        response = None
+        if self.cart_exits():
+            response = {'found':1 , 'number': self.cart_len}
+        else:
+            response = {'found': 0, 'number': 0}
+        response = json.dumps(response)
+        return JsonResponse(json.loads(response), safe=False)
+
+    def cart_exits(self):
+        self.client_id = self.request.user.id
+        if Cart.objects.filter(client_id = self.client_id).exists():
+            self.cart = Cart.objects.get(client_id = self.client_id)
+            self.cart_len = self.cart.products.all().__len__()
+            return True
 
 
 

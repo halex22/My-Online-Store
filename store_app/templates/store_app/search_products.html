@@ -1,0 +1,17 @@
+{% extends "src/base.html" %}
+
+{% block title %}Search Result{% endblock title %}
+
+
+
+{% block content %}
+<div id="list-container" class=" md:grid grid-cols-12">
+    {% for product in products %}
+    <div class="single-product-container mx-4 mt-4  md:col-span-6 lg:col-span-4">
+        {% include 'src/components/product_card.html'%}
+    </div>		
+    {% endfor %}
+</div>
+
+
+{% endblock content %}

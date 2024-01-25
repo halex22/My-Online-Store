@@ -27,3 +27,15 @@ def remainer_range(value):
 def make_float(value):
     return round(float(value), 1)
 
+
+@register.filter(name='another_page')
+def number_test(value, direction):
+    current_page = value.number
+    total_pages = value.paginator.num_pages
+    if direction:
+        return True if (current_page + 2) <= total_pages else False
+    else:
+        return True if (current_page - 2) >= 1 else False
+@register.filter(name='add_page_number')
+def add_page_number(value, direction):
+    return (value.number + 2) if direction else (value.number - 2)

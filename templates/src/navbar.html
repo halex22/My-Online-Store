@@ -3,36 +3,61 @@
     id="inner-nav-container"
     class="grid grid-cols-5 text-lg text-white font-bold"
   >
-    <section class="col-span-1 px-2">
+    <section class="col-span-1 md:col-span-3 px-2 flex items-center">
       <header>
-        <h2><a href="{% url 'home-store' %}">E Store</a></h2>
+        <h2 class="text-xl md:text-2xl font-bold"><a href="{% url 'home-store' %}">E Store</a></h2>
       </header>
     </section>
 
-    <section id="p-list" class="col-span-3">
+    <section id="p-list" class="col-span-2 md:col-span-1 flex justify-end">
       {% if  user.is_authenticated %}
-        <ul class="flex justify-evenly">
-          <li class=""><a href="{% url 'add-new-food' %}">New Food Product</a></li>
-          <li class=""><a href="{% url 'add-new-electro' %}">New Electronic Product</a></li>
-          <li class=""><a href="{% url 'add-new-forni' %}">New Forniture Product</a></li>
-        </ul>
+
+
+      <div id="dropdownProduct">
+      <button id="dropdownHoverButton" data-dropdown-toggle="dropdownHover" data-dropdown-trigger="hover" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">Add Product<svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+        </svg>
+      </button>
+        
+        <div id="dropdownHover" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+            <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownHoverButton">
+              <li class=""><a class="block px-4 py-2 hover:bg-gray-100" href="{% url 'add-new-food' %}">Food Product</a></li>
+              <li class=""><a class="block px-4 py-2 hover:bg-gray-100" href="{% url 'add-new-electro' %}">Electronic Product</a></li>
+              <li class=""><a class="block px-4 py-2 hover:bg-gray-100" href="{% url 'add-new-forni' %}">Forniture Product</a></li>
+            </ul>
+        </div>
+      </div>
+        
       {% endif %}
     </section>
 
-    <section id="auth-section" class="col-span-1">
-      <ul class="grid grid-cols-2 text-center">
-        {% if user.is_anonymous %}
-        <li><a href="{% url 'log-in' %}">Log In</a></li>
-        <li><a href="{% url 'sign-up' %}">Register</a></li>
-        {% else %}
-          <div class="flex justify-end">
-            {% include 'src/avatar_dropdown.html' %}
-          </div>
-        <div>          
-          <span><a href="{% url 'cart' %}">Cart</a></span>
-        </div>
-        {% endif %}
-      </ul>
+    {% if user.is_anonymous %}
+    <section id="auth-user-section" class="col-span-1 flex justify-around items-center">
+      <div class="inline"><a href="{% url 'log-in' %}">Log In</a></div>
+      <div class="inline"><a href="{% url 'sign-up' %}">Register</a></div>
     </section>
+    {% else %}
+
+    <section class="col-span-2 md:col-span-1 flex items-center justify-center">
+
+
+      <div id="avatar-dropdown" >
+        {% include 'src/avatar_dropdown.html' %}
+      </div>
+
+      <div class="mx-2">
+        <button type="button" class="relative">
+          <a href="{% url 'cart' %}">Cart</a>
+          <span class="sr-only">Cart</span>
+          <div id="cart-number" class="sr-only absolute inline-flex items-center justify-center w-4 h-4 text-sm font-bold text-white bg-red-500 border-white rounded-full -top-2">1</div>
+        </button>          
+        
+      </div>
+
+    </section>
+    {% endif %}
+
+
+
   </div>
 </nav>

@@ -4,17 +4,28 @@
 
 {% block content %}
 <div id="main-container" class="mx-4">
+
+	<aside id="search-bar">
+		{%  include 'store_app/search.html'%}
+	</aside>
+
 	{% if no_products %}
 	<div class="text-center mt-12">
 		<p class="text-lg font-semibold">Looks like this seller has no product in the store</p>
 	</div>
 	{% else %}
-	<div id="list-container" class="grid grid-col-6 md:grid-col-6 lg:grid-cols-12">
-		{% for product in products %}
-		<div class="single-product-container mx-4 mt-4 md:col-span-3 lg:col-span-4">
+
+	<div id="list-container" class=" md:grid grid-cols-12">
+		{% for product in page_obj %}
+		<div class="single-product-container mx-4 mt-4 flex justify-center md:col-span-6 lg:col-span-4 ">
 			{% include 'src/components/product_card.html'%}
 		</div>		
 		{% endfor %}
+		
+	</div>
+
+	<div class="m-4 flex justify-center">
+		{% include 'store_app/pagination.html' %}
 	</div>
 	{% endif %}
 </div>
