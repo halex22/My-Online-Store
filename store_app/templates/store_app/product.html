@@ -57,13 +57,13 @@
 
 			{% endif %}
 
-			<div id="rating" class="max-sm:flex justify-center mt-2">
-				<span>Global rating</span>
-				<div>{% include 'src/components/global_rating.html' with rating=product.rating%}</div>				
+			<div id="rating" class="flex justify-center mt-2 md:justify-start">
+				<span class="me-2">Global rating</span>
+				<div class="flex items-center">{% include 'src/components/global_rating.html' with rating=product.rating%}</div>				
 			</div> 
 
 
-			<div class="flex mt-4 max-sm:justify-center">
+			<div class="flex mt-4 justify-center md:justify-start">
 				<div class="me-4">
 					{% include 'src/components/check_x.html' with key='is local' state=product.is_local %}
 				</div>
@@ -72,37 +72,42 @@
 				</div>
 			</div>
 
-			<div id="product-description" class="mt-4">
-				<h4 class="mb-2 text-lg font-semibold text-gray-900">Description</h4>
-				<p class="text-gray-500 text-base">
-				{% if product.description %}
-					{{product.description}}
-				{% else %}
-					<span >The seller has not provide a description yet</span>
-				{% endif %}
-				</p>
+			<div id="product-description" class="mt-4 flex justify-center md:justify-start">
+				<div>
+					<h4 class="mb-2 text-lg font-semibold text-gray-900">Description</h4>
+					<p class="text-gray-500 text-base">
+					{% if product.description %}
+						{{product.description}}
+					{% else %}
+						<span >The seller has not provide a description yet</span>
+					{% endif %}
+					</p>
+				</div>
 			</div>
 
-			<div id="characteristics" class="mt-4">
-				<h2 class="mb-2 text-lg font-semibold text-gray-900">Product characteristics:</h2>
-				<ul class="max-w-md space-y-1 text-gray-500 list-disc list-inside">
-						<li class="text-base">
-								I'ts really good
-						</li>
-						<li class="text-base">
-								Better than others
-						</li>
-						<li class="text-base">
-								Why ? I'm not telling you why
-						</li>
-				</ul>
+			<div id="characteristics" class="mt-4 flex justify-center md:justify-start">
+				<div>
+					<h2 class="mb-2 text-lg font-semibold text-gray-900">Product characteristics:</h2>
+					<ul class="text-left max-w-md space-y-1 text-gray-500 list-disc list-inside">
+							<li class="text-base">
+									I'ts really good
+							</li>
+							<li class="text-base">
+									Better than others
+							</li>
+							<li class="text-base">
+									Why ? I'm not telling you why
+							</li>
+					</ul>
+				</div>
 			</div>
 
-			<div id="tiem" class="mt-4 text-sm text-gray-500">
-				<div class="flex"><p class="min-w-36">Producted added on: </p> <span>{{product.added_date}}</span></div>
-				<div class="flex"><p class="min-w-36">Last modified: </p> <span>{{product.modified_date}}</span></div>
+			<div id="tiem" class="flex justify-center md:justify-start mt-4 text-sm text-gray-500">
+				<div>
+					<div class="flex"><p class="min-w-36">Producted added on: </p> <span>{{product.added_date}}</span></div>
+					<div class="flex"><p class="min-w-36">Last modified: </p> <span>{{product.modified_date}}</span></div>
+				</div>
 			</div>
-			
 		</section>
 	</div>
 
