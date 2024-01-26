@@ -3,6 +3,10 @@ from .views import *
 
 
 urlpatterns = [
+
+    path('user-profile', view=UserView.as_view(), name='user-profile'),
+    path('update-user-info', view=EditUserView.as_view(), name='edit-user'),
+
     # Create model paths
     path('add/new-food-product', view=AddFoodView.as_view(), name='add-new-food'),
     path('add/new-electronic-product', view=AddElecView.as_view(), name='add-new-electro'),

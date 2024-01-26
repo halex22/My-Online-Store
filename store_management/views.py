@@ -1,7 +1,11 @@
 from typing import Any
 from django.contrib.auth import login
+from django.db.models.base import Model as Model
+from django.db.models.query import QuerySet
 from django.urls import reverse, reverse_lazy
-from django.views.generic import CreateView, UpdateView, DeleteView
+from django.views.generic import CreateView, UpdateView, DeleteView, TemplateView
+from django.views.generic.detail import BaseDetailView
+from django.views.generic.edit import BaseUpdateView
 from .aux_code import decorators
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import redirect
@@ -111,3 +115,26 @@ class DeleteProductView(MyDeleteView):
         seller_name = self.request.user.seller.name
         seller_id = self.request.user.seller.id
         return reverse('seller-products', kwargs={'name':seller_name, 'pk':seller_id})
+    
+
+class BaseUserProfile(LoginRequiredMixin, BaseDetailView):
+    """View that fetches the user instance only if this is logged in"""
+    login_url =  reverse_lazy('log-in')
+    model = StoreUser
+
+    def get_object(self, queryset: QuerySet[Any] | None = ...) -> Model:
+        return self.model.objects.get(pk=self.request.user.id)
+
+
+class UserView(BaseUserProfile, TemplateView):
+    """Combines the user mixin with a template view logic"""
+    template_name = 'store_management/user.html'
+    context_object_name = 'user'
+
+
+class EditUserView(BaseUserProfile, UpdateView):
+    form_class = EditUserForm
+    template_name = "store_management/update/user.html"
+
+    def get_success_url(self) -> str:
+        return reverse_lazy('user-profile')

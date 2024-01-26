@@ -39,6 +39,8 @@ class SearchProductsView(ListView):
     model = BaseProduct
     template_name = 'store_app/search_products.html'
     context_object_name = 'products'
+
+
         
     def get_user_query(self):
         q = self.request.get_full_path_info().split('=')[1]

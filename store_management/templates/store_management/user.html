@@ -1,0 +1,45 @@
+{% extends "src/base.html" %}
+
+{% block title %}{{user|title}}{% endblock title %}
+
+
+{% block content %}
+<div id="outer-main-container" class="mx-4 mb-4">
+
+    <div class="flex flex-col items-center my-4">
+        <h2 class="text-xl font-semibold">User Profile Page</h2>
+        <p class="text-gray-600 text-sm">Welcome to this page, here you can find all the usefull info regarding your profile</p>
+    </div>
+
+    <div id="inner-container" class="md:grid md:grid-cols-3">
+        <section id="personal-info" class="md:col-span-2 p-6">
+            <h4 class="mb-4 text-xl font-semibold block">Given name: <span>{% if user.first_name  %}{{user.first_name}}{% else %}Unknown{% endif %}</span></h4>
+            <h4 class="mb-4 text-xl font-semibold">Last name: <span>{% if user.last_name  %}{{user.last_name}}{% else %}Unknown{% endif %}</span></h4>
+            <h4 class="mb-4 text-xl font-semibold">Store Userame: <span>{% if user.username  %}{{user.username}}{% else %}Unknown{% endif %}</span></h4>
+
+            <div><h5 class="text-sm text-gray-500">Account Created: {{user.date_joined}} </h5></div>
+            <div class="mt-4">
+                <span class="sr-only">Edit info button </span>
+                <a href="{% url 'edit-user' %}" class="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-2 py-1">Edit Info</a>
+            </div>
+        </section>
+
+        <section class="md:col-span-1 flex" >
+            {% if user.is_seller %}
+            <div class="p-6">
+                <img src="/media/defaults/seller.jpg" alt="" class="w-40 h-40">
+            </div>
+            <h6 class="flex items-center font-semibold text-yellow-400">Thanks from been a Seller</h6>
+            {% else %}
+            <div class="flex flex-col items-center justify-center">
+                <h6 class="font-semibold">What to become a seller?</h6>
+                <h5 class="mb-4">just click in the following button</h5>
+                <span class="sr-only">become seller button</span>
+                <a href="{% url 'become-seller'%}" class="bg-yellow-400 hover:bg-yellow-500 text-white rounded-lg px-2 py-1 font-semibold">Become a Seller</a>
+
+            </div>
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock content %}

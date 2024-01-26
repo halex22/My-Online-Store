@@ -44,3 +44,10 @@ class ForniModelForm(BaseProductForm):
         model = FornitureProduct
         fields = ['name', 'price', 'is_available', 'img', 'description']
         help_texts = help_texts
+
+
+class EditUserForm(ModelForm):
+
+    class Meta:
+        model = StoreUser
+        fields = ['username', 'first_name', 'last_name', 'email' , 'card_number']

@@ -18,7 +18,7 @@
   class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44"
 >
   <div class="px-4 py-3 text-sm text-gray-900 dark:text-white">
-    <div>{{user.username|title}}</div>
+    <div><a href="{% url 'user-profile' %}">{{user.username|title}}</a></div>
     <div class="font-medium truncate">{{user.email}}</div>
   </div>
   <ul
