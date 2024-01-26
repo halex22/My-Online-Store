@@ -5,7 +5,13 @@
 
 {% block content %}
 
-<div id="main-container" class="mx-4">
+<div id="main-container" class="mx-4 mb-6">
+
+	<section class="">
+		<header class="flex justify-center my-4"><h2 class="text-2xl font-bold">{{seller_name|title}}</h2></header>
+		<p class="flex justify-center font-semibold text-lg">Product list</p>
+	</section>
+
 	{% if no_products %}
 	<div class="text-center mt-12">
 		<p class="text-lg font-semibold">Looks like this seller has no product in the store</p>
@@ -13,17 +19,21 @@
 	{% else %}
 	<div id="list-container" class=" md:grid lg:grid-cols-12">
 		{% for product in products %}
-		<div class="single-product-container mx-4 mt-4 md:col-span-6 flex justify-center">
+		<div class="single-product-container mx-4 mt-4 md:col-span-6 lg:col-span-4 flex justify-center">
 			{% include 'src/components/product_card.html'%}
 		</div>		
 		{% endfor %}
 	</div>
 	{% endif %}
+
+	{% if page_obj.paginator.num_pages > 1 %}
+		<div class="m-4 flex justify-center">
+			{% include 'store_app/pagination.html' %}
+		</div>
+	{% endif %}
 </div>
 
-<div class="m-4 flex justify-center">
-	{% include 'store_app/pagination.html' %}
-</div>
+
 
 <script>
 	const containers = document.getElementsByClassName('single-product-container');

@@ -98,7 +98,12 @@ class ProductsBySellerView(ListView):
     template_name = 'store_app/product_list.html'
     model = BaseProduct
     context_object_name = 'products'
-    paginate_by = 4
+    paginate_by = 6
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['seller_name'] = Seller.objects.get(pk=self.kwargs['pk']).name
+        return context
 
     def get_queryset(self) -> QuerySet[Any]:
         return self.model.objects.filter(seller_id=self.kwargs['pk'])
@@ -166,7 +171,8 @@ class RemoveFromCart(MyRemoveView):
 
     def post(self, request: HttpRequest, *args, **kwargs):
         self.set_object()
-        item = CartItem.objects.get(product_id=self.product.pk)
+        parms = {'product_id':self.product.pk , 'customer_id':self.request.user.id}
+        item = CartItem.objects.get(**parms)
         if item:
             self.test_model_object.products.remove(item)
             item.delete()
@@ -292,7 +298,7 @@ class GetCartNumber(View):
         if Cart.objects.filter(client_id = self.client_id).exists():
             self.cart = Cart.objects.get(client_id = self.client_id)
             self.cart_len = self.cart.products.all().__len__()
-            return True
+            return True if self.cart_len > 0 else False
 
 
 

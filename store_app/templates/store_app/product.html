@@ -130,8 +130,11 @@
 
 	<section class="max-sm:flex flex-col items-center md:block md:mx-4 mb-4">
 		<header><h2 class="font-bold text-2xl">Other products you may like</h2></header>
+		<a id="moreProductsUrl" href="{% url 'more-products' s_pk=product.seller.pk p_pk=product.pk %}"></a>
+
+
 		<div id="other-products" class="md:grid grid-cols-3">
-			<a id="moreProductsUrl" href="{% url 'more-products' s_pk=product.seller.pk p_pk=product.pk %}"></a>
+
 		</div>
 		<div id="card-placeholders" class="md:grid grid-cols-3 mx-4 mb-4">
 			<div class="col-span-1">{% include 'src/components/product/card_placeholder.html'%}</div>
