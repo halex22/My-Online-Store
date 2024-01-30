@@ -44,7 +44,7 @@ class BaseProduct(models.Model):
                                 MinLengthValidator(10, message='Name must contain at list 10 characters')
                             ])
     is_available = models.BooleanField(default=True)
-    added_date = models.DateField(auto_now_add=True)
+    added_date = models.DateField(auto_now_add=True, db_index=True)
     modified_date = models.DateField(auto_now=True)
     img = models.ImageField(upload_to="images", blank=True, null=True)
     rating = models.FloatField(default=0,
@@ -52,8 +52,8 @@ class BaseProduct(models.Model):
             MinValueValidator(0, message="The rating must be above 0"),
             MaxValueValidator(5, message="max rating value is 5")
         ])
-    n_votes = models.IntegerField(default=0, null= True, blank=True, validators=[MinValueValidator(0, message='votes recived can not be lower than 0')])
-    total_score = models.IntegerField(default=0, null= True, blank=True, validators=[MinValueValidator(0, message='total score can not be lower than 0')])
+    n_votes = models.IntegerField(db_index= True, default=0, null= True, blank=True, validators=[MinValueValidator(0, message='votes recived can not be lower than 0')])
+    total_score = models.IntegerField(db_index= True, default=0, null= True, blank=True, validators=[MinValueValidator(0, message='total score can not be lower than 0')])
     slug = models.SlugField(blank=True)
     seller = models.ForeignKey(
         Seller, on_delete=models.CASCADE, related_name="product_seller")

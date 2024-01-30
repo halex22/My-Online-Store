@@ -19,10 +19,12 @@
 		{% for product in page_obj %}
 		<div class="single-product-container mx-4 mt-4 flex justify-center md:col-span-6 lg:col-span-4 ">
 			{% include 'src/components/product_card.html'%}
-		</div>		
+		</div>
 		{% endfor %}
-		
 	</div>
+		
+	
+		
 
 	<div class="m-4 flex justify-center">
 		{% include 'store_app/pagination.html' %}

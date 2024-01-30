@@ -1,0 +1,82 @@
+{% extends "src/base.html" %}
+{% load my_tags %}
+
+{% block title %}My orders{% endblock title %}
+
+{% block content %}
+<div id="main-container" class="mx-4 mb-8">
+
+    <section class="my-4">
+			<header class="text-center"><h2 class="text-4xl font-semibold">Your Orders</h2></header>
+
+
+			{% if orders %}
+			<div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+				<table class="w-full text-sm text-left rtl:text-right text-gray-500 ">
+					<caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white ">
+							Orders
+							<p class="mt-1 text-sm font-normal text-gray-500 ">Here you can find all the order that you have made chronologically.</p>
+					</caption>
+					<thead class="text-xs text-gray-700 uppercase bg-gray-50  ">
+						<tr>
+							<th scope="col" class="px-6 py-3">
+									Order ID
+							</th>
+							<th scope="col" class="px-6 py-3">
+									Date
+							</th>
+							<th scope="col" class="px-6 py-3">
+									Product Quantity
+							</th>
+							<th scope="col" class="px-6 py-3">
+									Price
+							</th>
+							<th scope="col" class="px-6 py-3">
+									<span class="sr-only">Edit</span>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for order in orders %}
+						<tr class="bg-white border-b ">
+							<th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+									{{order.pk}}
+							</th>
+							<td class="px-6 py-4">
+									{{order.added_date}}
+							</td>
+							<td class="px-6 py-4">
+									{{order.json_data|total_quantity}}
+							</td>
+							<td class="px-6 py-4">
+								
+									€ {{order.total}}
+							</td>
+							<td class="px-6 py-4 text-right">
+									<a href="{% url 'order' pk=order.pk %}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">More details</a>
+							</td>
+						</tr>
+						{% endfor %}
+
+					</tbody>
+				</table>
+			</div>
+
+			<div class="m-4 flex justify-center">
+				{% include 'store_app/pagination.html' %}
+			</div>
+			{% else %}
+
+			<div id="no-orders-container" class="text-center">
+				<header class="sr-only"><h2>No Orders</h2></header>
+				<p class="text-2xl font-semibold mt-8">You haven't made an order yet</p>
+			</div>
+
+			{% endif %}
+
+    </section>
+
+
+</div>
+
+{% endblock content %}

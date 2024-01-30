@@ -1,4 +1,7 @@
 from django import template
+from typing import List, Dict, Any, Union
+
+# order_item = Dict[int: Dict[str, Union[str, int]]]
 
 register = template.Library()
 
@@ -36,6 +39,20 @@ def number_test(value, direction):
         return True if (current_page + 2) <= total_pages else False
     else:
         return True if (current_page - 2) >= 1 else False
+    
+
 @register.filter(name='add_page_number')
 def add_page_number(value, direction):
     return (value.number + 2) if direction else (value.number - 2)
+
+
+@register.filter(name='total_quantity')
+def total_quantity(data:dict):
+    total = 0
+    for i in data.values():
+        total += i['quantity']
+    return total
+
+@register.filter(name='key_value')
+def key_value(data:dict, key:str) -> Union[str, int]:
+    return data[key]

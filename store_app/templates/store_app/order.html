@@ -1,0 +1,60 @@
+{% extends "src/base.html" %}
+{% load my_tags %}
+
+{% block title %}Order Information {% endblock title %}
+
+{% block content %}
+<div id="main-container" class="mx-4 mb-8">
+    <section class=" mt-6">
+        <header class="text-center"><h2 class="text-4xl font-semibold"> Detailed order information</h2></header>
+
+        <p class="my-4 ps-1">Total order : € <strong>{{order.total}}</strong></p>
+
+        <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+					<table class="w-full text-sm text-left rtl:text-right text-gray-500 ">
+						<thead class="text-xs text-gray-700 uppercase bg-gray-50 ">
+							<tr>
+								<th scope="col" class="px-6 py-3">
+										Product name
+								</th>
+								<th scope="col" class="px-6 py-3">
+										Quantity
+								</th>
+								<th scope="col" class="px-6 py-3">
+										Unit Price (€)
+								</th>
+								<th scope="col" class="px-6 py-3">
+										Total Cost (€)
+								</th>
+
+							</tr>
+						</thead>
+							<tbody>
+								{% for product in order.json_data.values %}
+								<tr class="bg-white border-b ">
+									<th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">
+											{{product|key_value:'name'}}
+									</th>
+									<td class="px-6 py-4">
+											{{product|key_value:'quantity'}}
+									</td>
+									<td class="px-6 py-4">
+											{{product|key_value:'price'}}
+									</td>
+									<td class="px-6 py-4">
+											{{product|key_value:'total_cost'}}
+									</td>
+								</tr>
+								{% endfor %}
+
+							</tbody>
+					</table>
+        </div>
+    </section>
+
+		<aside class="text-center mt-8">
+			<a href="{% url 'my-orders' %}" class="rounded-lg font-semibold text-white bg-blue-500 hover:bg-blue-600 px-2 py-1">Back to orders</a>
+		</aside>
+</div>
+
+{% endblock content %}

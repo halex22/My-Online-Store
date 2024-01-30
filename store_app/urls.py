@@ -3,10 +3,13 @@ from .views import *
 
 
 urlpatterns = [
-    path('', view=HomeStore.as_view(), name='home-store'),
+    path('home', view=HomeStore.as_view(), name='home-store'),
+    path('all-products', view=AllProducts.as_view(), name='all-products'),
     path('product/<int:pk>', view=ProductView.as_view(), name='product'),
     path('products/<str:name>-<int:pk>', view=ProductsBySellerView.as_view(), name='seller-products'),
     path('search/products', view=SearchProductsView.as_view(), name='search'),
+    path('my-orders', view=OrdersView.as_view(), name='my-orders'),
+    path('order/<int:pk>', view=OrderView.as_view(), name='order'), 
 
     # Cart views
     path('my-cart', view=MyCartView.as_view(), name='cart'),

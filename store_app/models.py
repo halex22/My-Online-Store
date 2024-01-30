@@ -1,5 +1,24 @@
+from typing import List
 from django.db import models
 from store_management.models import *
+import json
+
+def get_actual_instance_price(instance: BaseProduct) -> str:
+    """
+    Takes an instance of the BaseProduct model and returns the 
+    actual instance price as a string
+    """
+    actual_instance = None
+    if hasattr(instance, 'foodproduct'):
+            actual_instance = instance.foodproduct
+    elif hasattr(instance, 'electronicproduct'):
+        actual_instance = instance.electronicproduct
+    else:
+        actual_instance = instance.fornitureproduct
+    return str(actual_instance.price)
+
+
+
 
 product_types = ['foodproduct', 'electronicproduct', 'fornitureproduct']
 
@@ -71,3 +90,24 @@ class Comment(BaseModel):
     product = models.ForeignKey(BaseProduct, on_delete=models.CASCADE, related_name='comments')
     rating = models.OneToOneField(Rating, on_delete=models.CASCADE, null=True, blank=True)
     text = models.TextField(null=True)
+
+
+class Order(BaseModel):
+    json_data = models.JSONField(null=True)
+    total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, null=True, blank=True)
+
+    def make_data(self, products: List[CartItem]):
+        data = {}
+        for item in products:
+            single_product_data = {
+                item.pk: {
+                    'name': item.product.name,
+                    'price': get_actual_instance_price(item.product),
+                    'quantity': item.quantity,
+                    'total_cost': str(item.total_cost)
+                }
+            }
+            data.update(single_product_data)
+        self.json_data = json.loads(json.dumps(data))
+        
+

@@ -65,6 +65,8 @@
 			{% include 'src/components/payment_methods.html' %}
 
 		</section>
+
+		<a id="go" href="{% url 'payment' %}" class="sr-only">pay</a>
 	</div>
 	{% else %}
 	<section>
@@ -76,6 +78,17 @@
 	{% endif %}
 
 </div>
+
+<script>
+	const target = document.getElementById('payment-methods');
+	const btns = target.querySelectorAll('button');
+	[...btns].forEach((btn) => {
+		btn.addEventListener('click', () => {
+			const link = document.getElementById('go');
+			link.click();
+		})
+	})
+</script>
 
 
 {% endblock content %}

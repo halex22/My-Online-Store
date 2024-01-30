@@ -1,11 +1,13 @@
 from typing import Any
 from django.forms import BaseModelForm
 from django.contrib.auth import login
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
-from django.http import HttpRequest, HttpResponse
-from django.views.generic import CreateView
+from django.http import HttpRequest, HttpResponse, HttpResponse as HttpResponse
+from django.views.generic import CreateView, TemplateView
+from store_app.models import Cart, CartItem, Order
 from store_management.aux_code import decorators
 
 from django.shortcuts import redirect
@@ -75,3 +77,42 @@ class BecomeSeller(MyBaseCreateView):
     @decorators.add_info_to_form(edit_user_model=True)
     def form_valid(self, form):
         return super().form_valid(form)
+
+
+class PaymentView(LoginRequiredMixin, TemplateView):
+    template_name = 'store_auth/payment.html'
+
+
+class TransactionTest(LoginRequiredMixin, UserPassesTestMixin):
+    model = Cart
+    cart_obj = None
+    
+    def test_func(self) -> bool:
+        try:
+            self.cart_obj = Cart.objects.get(client_id= self.request.user.id)
+            return True
+        except:
+            return False
+
+
+class TransactionDoneView(TransactionTest, TemplateView):
+    template_name = 'store_auth/payment_done.html'
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if self.cart_obj.products.all().__len__() > 0:
+            self.create_order()
+            self.empty_cart()
+            return super().get(request, *args, **kwargs)
+        else:
+            return redirect('home-store')
+
+    def empty_cart(self, *args, **kwargs):
+        for item in self.cart_obj.products.all():
+            self.cart_obj.products.remove(item)
+            item.delete()
+        self.cart_obj.save()
+
+    def create_order(self):
+        new_order = Order(client=self.request.user, total= self.cart_obj.total_price)
+        new_order.make_data(self.cart_obj.products.all())
+        new_order.save()

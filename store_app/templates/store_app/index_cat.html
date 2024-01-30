@@ -1,0 +1,64 @@
+{% extends "src/base.html" %}
+
+
+{% block title %}Home{% endblock title %}
+
+{% block content %}
+
+<div id="main-container" class="mx-4 mb-8">
+
+    <aside id="search-bar">
+		{%  include 'store_app/search.html'%}
+	</aside>
+
+    <section>
+        <header class="mt-6 ps-7"><h2 class="font-semibold text-2xl">Last Added Products</h2></header>
+        <div id="list-container" class=" md:grid grid-cols-12">
+            {% for product in last_added %}
+            <div class="single-product-container mx-4 mt-4 flex justify-center md:col-span-6 lg:col-span-4 ">
+                {% include 'src/components/product_card.html'%}
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section>
+        <header class="mt-6 ps-7"><h2 class="font-semibold text-2xl">Most Popular</h2></header>
+        <div id="list-container" class=" md:grid grid-cols-12">
+            {% for product in most_voted %}
+            <div class="single-product-container mx-4 mt-4 flex justify-center md:col-span-6 lg:col-span-4 ">
+                {% include 'src/components/product_card.html'%}
+            </div>	
+            {% endfor %}
+        </div>
+    </section>
+
+    <section>
+        <header class="mt-6 ps-7"><h2 class="font-semibold text-2xl">Most Rated</h2></header>
+        <div id="list-container" class=" md:grid grid-cols-12">
+            {% for product in most_rated %}
+            <div class="single-product-container mx-4 mt-4 flex justify-center md:col-span-6 lg:col-span-4 ">
+                {% include 'src/components/product_card.html'%}
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <aside class="text-center mt-4">
+        <h2 class="font-semibold text-2xl text-white">
+            <a href="{% url 'all-products' %}" class="rounded-lg bg-green-500 hover:bg-green-600 px-2 py-1">See All products</a>
+        </h2>
+    </aside>
+
+</div>
+<script>
+	const containers = document.getElementsByClassName('single-product-container');
+	for (const container of containers) {
+		container.addEventListener('click', () => {
+			const target = container.querySelector('.link-to-product');
+			target.click()
+		})
+	}
+</script>
+
+{% endblock content %}

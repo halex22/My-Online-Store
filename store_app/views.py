@@ -1,23 +1,27 @@
 from typing import Any, Union, List
 import json
+from django.core.cache import cache
 from django.db.models.query import QuerySet
 from django.http import HttpRequest, HttpResponse, HttpResponse as HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import HttpResponse
 from django.views.generic import TemplateView, DetailView, ListView, View
+from django.views.generic.detail import BaseDetailView
 from store_management.models import BaseProduct
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.db.models import Q
 from .models import *
-from .forms import RateAndCommetForm
-from django.core.paginator import Paginator
 from .my_classes.remove import MyRemoveView
 from .my_classes.base import BaseRequireView
 from .my_classes.object import MyObjectView
 from .my_classes.rate import RateView
 
-def get_actual_instance_price(instance) -> str:
+def get_actual_instance_price(instance: BaseProduct) -> str:
+    """
+    Takes an instance of the BaseProduct model and returns the 
+    actual instance price as a string
+    """
     actual_instance = None
     if hasattr(instance, 'foodproduct'):
             actual_instance = instance.foodproduct
@@ -28,8 +32,29 @@ def get_actual_instance_price(instance) -> str:
     return str(actual_instance.price)
 
 
+class HomeStore(TemplateView):
+    template_name = 'store_app/index_cat.html'
+    model = BaseProduct
+    
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['last_added'] = self.filter_products('added_date')
+        context['most_voted'] = self.filter_products('n_votes')
+        context['most_rated'] = self.filter_products('total_score')
+        return context
+    
+    def filter_products(self, filter:str) -> QuerySet:
+        filterd_products = cache.get(filter)
 
-class HomeStore(ListView):
+        if filterd_products is None:
+            filterd_products = self.model.objects.all().order_by(f'-{filter}')[:3]
+            cache.set(filter, filterd_products, timeout=600) # ten minutes    
+        return filterd_products
+
+
+
+
+class AllProducts(ListView):
     model = BaseProduct
     paginate_by = 6
     template_name = 'store_app/index.html'
@@ -101,14 +126,19 @@ class ProductsBySellerView(ListView):
     model = BaseProduct
     context_object_name = 'products'
     paginate_by = 6
+    n_products = None
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['seller_name'] = Seller.objects.get(pk=self.kwargs['pk']).name
+        context['n_products'] = self.n_products
+        
         return context
 
     def get_queryset(self) -> QuerySet[Any]:
-        return self.model.objects.filter(seller_id=self.kwargs['pk'])
+        query = self.model.objects.filter(seller_id=self.kwargs['pk'])
+        self.n_products = query.count()
+        return query
 
 
 # Object views
@@ -125,7 +155,7 @@ class MyWishView(MyObjectView):
 
 # Add views
 class Add2Cart(LoginRequiredMixin, BaseRequireView):
-    login_url = '/log-in'
+    login_url = reverse_lazy('log-in')
     cart_item = None
     quantity = None
 
@@ -154,7 +184,7 @@ class Add2Cart(LoginRequiredMixin, BaseRequireView):
 
 
 class Add2Wish(LoginRequiredMixin, BaseRequireView):
-
+    login_url = reverse_lazy('log-in')
     def post(self, request: HttpRequest, *args, **kwargs):
         self.set_object()
         list, created = WishList.objects.get_or_create(
@@ -304,3 +334,18 @@ class GetCartNumber(View):
 
 
 
+class OrdersView(LoginRequiredMixin, ListView):
+    login_url = reverse_lazy('log-in')
+    template_name = 'store_app/orders.html'
+    model = Order
+    context_object_name = 'orders'
+    paginate_by = 8
+
+    def get_queryset(self) -> QuerySet[Order]:
+        return self.model.objects.filter(client_id= self.request.user.id).order_by('-added_date')
+
+
+class OrderView(LoginRequiredMixin, BaseDetailView, TemplateView):
+    template_name = 'store_app/order.html'
+    login_url = reverse_lazy('log-in')
+    model = Order
