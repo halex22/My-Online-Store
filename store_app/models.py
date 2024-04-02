@@ -1,7 +1,10 @@
-from typing import List
-from django.db import models
-from store_management.models import *
 import json
+from typing import List
+
+from django.db import models
+
+from store_management.models import *
+
 
 def get_actual_instance_price(instance: BaseProduct) -> str:
     """
@@ -46,24 +49,19 @@ class Cart(models.Model):
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, null=True, blank=True)
 
     def calculate_total_price(self):
-        total = 0
-        for item in self.products.all():
-            total += item.total_cost
-        return total
+        return sum(item.total_cost for item in self.products.all())
+        # total = 0
+        # for item in self.products.all():
+        #     total += item.total_cost
+        # return total
 
     def save(self, *args, **kwargs):
-        # when the cart is crated it has no prodcuts
-        # so only when it has some it will calculate the total_price
-        
-        try:
-            # self.total_price = self.calculate_total_price()
-            if self.products.all().__len__() == 0:
-                self.total_price = 0
-            else:
-                self.total_price = self.calculate_total_price()
 
-        except:
-            pass
+        if self.products.exists():
+            self.total_price = self.calculate_total_price()
+        else:
+            self.total_price = 0
+
         super().save(*args, **kwargs)
 
 
